@@ -27,7 +27,7 @@ public class UserRequestHandler extends Thread {
 	}
 
 	private void handle(UserRequest request) {
-		// TODO Auto-generated method 
+		// TODO Auto-generated method stub
 		
 		System.out.println(request.getRequestString());
 	}
