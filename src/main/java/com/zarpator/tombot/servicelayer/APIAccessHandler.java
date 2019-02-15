@@ -1,16 +1,12 @@
 package com.zarpator.tombot.servicelayer;
 
-import com.zarpator.tombot.logic.UserRequest;
+import com.zarpator.tombot.logic.UserMessage;
+import com.zarpator.tombot.servicelayer.receiving.TgmAnswerSuperClass;
+import com.zarpator.tombot.servicelayer.sending.HttpMessageForTelegramServers;
 
-public class APIAccessHandler {
-	private static int mockRequestCount = 10;
+public interface APIAccessHandler {
+	public UserMessage[] fetchNewUserRequests();
 
-	public static UserRequest[] fetchNewUserRequests() {
-		UserRequest[] receivedRequests = new UserRequest[mockRequestCount];
-		for	(int i = 0; i < mockRequestCount; i++) {
-			receivedRequests[i] = new UserRequest();
-			receivedRequests[i].setRequestString("Request Nr. " + (i+1));
-		}
-		return receivedRequests;
-	}
+	public <T extends TgmAnswerSuperClass> T sendMessageToServer(HttpMessageForTelegramServers message,
+			Class<T> typeOfTheTgmAnswer);
 }

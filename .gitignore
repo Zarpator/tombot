@@ -16,10 +16,15 @@
 *.iml
 *.ipr
 
-### NetBeans ###
+### NetBeans 
+###
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
 /build/
+ 
+
+### local Token
+src/main/java/servicelayer/sending/localInfo.json
