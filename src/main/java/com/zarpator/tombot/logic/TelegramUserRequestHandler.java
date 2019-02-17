@@ -5,52 +5,48 @@ import java.util.ArrayList;
 import com.zarpator.tombot.servicelayer.APIAccessHandler;
 import com.zarpator.tombot.servicelayer.TelegramAPIAccessHandler;
 import com.zarpator.tombot.servicelayer.receiving.TgmAnswerWithMessage;
+import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUpdate;
 import com.zarpator.tombot.servicelayer.sending.HttpMessageForTelegramServers;
-import com.zarpator.tombot.servicelayer.sending.PresetMessageForSendMessage;
 
 public class TelegramUserRequestHandler extends UserRequestHandler {
 	APIAccessHandler myAPIAccessHandler;
 	protected Inspector myInspector;
-	
+
 	public TelegramUserRequestHandler() {
 		myAPIAccessHandler = new TelegramAPIAccessHandler();
 		myInspector = new Inspector();
 	}
-	
-
 
 	@Override
-	protected UserMessage[] fetch() {
+	protected TgmUpdate[] fetch() {
 		return myAPIAccessHandler.fetchNewUserRequests();
 	}
-	
-	protected ArrayList<ServerMessage> handle(UserMessage[] userRequests) {
 
-		ArrayList<ServerMessage> serverMessages = new ArrayList<ServerMessage>();
+	protected ArrayList<HttpMessageForTelegramServers> handle(TgmUpdate[] messages) {
 
-		for (UserMessage request : userRequests) {
+		ArrayList<HttpMessageForTelegramServers> answers = new ArrayList<HttpMessageForTelegramServers>();
 
-			// TODO let the inspector take a UserRequest-Object,
-			// not a TgmUpdateWithAnswerArray
-			ArrayList<HttpMessageForTelegramServers> httpMessagesToReturn = myInspector
-					.analyzeAnswerWithUpdatesAndGiveAppropriateMessageArrayList(answer);
+		for (TgmUpdate userMessage : messages) {
 
-			// TODO convert httpMessagesToReturn to ServerMessages
-			serverMessages.addAll(messagesToReturn);
+			ArrayList<HttpMessageForTelegramServers> messageForServer = myInspector.doSpecificLogic(userMessage);
+
+			if (messageForServer != null) {
+				answers.addAll(messageForServer);
+			}
 		}
 
-		return serverMessages;
+		return answers;
 	}
 
-	protected boolean send(ArrayList<ServerMessage> messagesForServer) {
+	@Override
+	protected void send(ArrayList<HttpMessageForTelegramServers> messagesForServer) {
 
-		ArrayList<HttpMessageForTelegramServers> httpMessagesForServer = new ArrayList<HttpMessageForTelegramServers>();
-		for (ServerMessage message : messagesForServer) {
-			httpMessagesForServer.add(new HttpMessageForTelegramServers(
-					new PresetMessageForSendMessage(message.getText(), message.getReceiverChatId())));
+		if (messagesForServer != null && messagesForServer.isEmpty()) {
+			System.out.println("No Messages to send to Telegram");
+			return;
 		}
-
-		for (HttpMessageForTelegramServers message : httpMessagesForServer) {
+		
+		for (HttpMessageForTelegramServers message : messagesForServer) {
 			if (message != null) {
 
 				TgmAnswerWithMessage returnedResponseFromTgmServer = myAPIAccessHandler.sendMessageToServer(message,
@@ -58,9 +54,8 @@ public class TelegramUserRequestHandler extends UserRequestHandler {
 				System.out.println("Telegramserver ist ok: " + returnedResponseFromTgmServer.isOk());
 				System.out.println("Nachricht: " + returnedResponseFromTgmServer.getResult().getText());
 			} else {
-				System.out.println("Received empty Message from Inspector");
+				System.out.println("Received empty Message!");
 			}
 		}
-		return false;
 	}
 }

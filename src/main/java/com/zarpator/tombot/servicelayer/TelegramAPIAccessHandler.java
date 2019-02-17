@@ -2,7 +2,6 @@ package com.zarpator.tombot.servicelayer;
 
 import org.springframework.web.client.RestTemplate;
 
-import com.zarpator.tombot.logic.UserMessage;
 import com.zarpator.tombot.servicelayer.receiving.TgmAnswerSuperClass;
 import com.zarpator.tombot.servicelayer.receiving.TgmAnswerWithUpdateArray;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUpdate;
@@ -11,21 +10,11 @@ import com.zarpator.tombot.servicelayer.sending.PresetMessageForGetUpdates;
 
 public class TelegramAPIAccessHandler implements APIAccessHandler {
 
-	public UserMessage[] fetchNewUserRequests() {
+	public TgmUpdate[] fetchNewUserRequests() {
 		TgmAnswerWithUpdateArray answer = this.sendMessageToServer(
 				new HttpMessageForTelegramServers(new PresetMessageForGetUpdates()), TgmAnswerWithUpdateArray.class);
 
-		TgmUpdate[] tgmUpdates = answer.getResult();
-		UserMessage[] userRequests = new UserMessage[tgmUpdates.length];
-
-		for (int i = 0; i < tgmUpdates.length; i++) {
-			userRequests[i] = new UserMessage(
-					tgmUpdates[i].getMessage().getChat().getId(),
-					tgmUpdates[i].getMessage().getText(), 
-					tgmUpdates[i].getMessage().getFrom().getFirst_name()
-					);
-		}
-		return userRequests;
+		return answer.getResult();
 	}
 
 	public <T extends TgmAnswerSuperClass> T sendMessageToServer(HttpMessageForTelegramServers message,

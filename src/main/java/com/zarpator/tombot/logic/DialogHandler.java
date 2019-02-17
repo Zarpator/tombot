@@ -53,7 +53,7 @@ public class DialogHandler {
 
 		MiddlelayerHttpAnswerForTelegram returnAnswer;
 
-		String currentDialogOfChat = dbChatWhereCommandWasGiven.getCurrentOngoingDialog();
+		String currentDialogOfChat;
 
 		if (dbChatWhereCommandWasGiven.isInDialog()) {
 			currentDialogOfChat = dbChatWhereCommandWasGiven.getCurrentOngoingDialog();

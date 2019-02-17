@@ -14,7 +14,7 @@ public class InternalEventHandler extends Thread {
 			checkNewDatedEvents();
 			
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(10000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

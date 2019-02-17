@@ -163,7 +163,6 @@ public class StartDialog extends AbstractFullDialog {
 	private class FinishSetupDialogState extends DialogState {
 		@Override
 		public MiddlelayerHttpAnswerForTelegram doLogic() {
-			dialogFinished = true;
 
 			MiddlelayerHttpAnswerForTelegram messageForDialogHandler = new MiddlelayerHttpAnswerForTelegram();
 			messageForDialogHandler.setChatId(dbUserWhoSentMessage.getId());
@@ -209,7 +208,10 @@ public class StartDialog extends AbstractFullDialog {
 
 			household.setLastDayOfPeriod(lastDayOfPeriod);
 
+			
 			messageForDialogHandler.setText("Danke! Es ist jetzt alles eingerichtet. Frag mich doch mal was :)");
+
+			dialogFinished = true;
 			return messageForDialogHandler;
 		}
 	}
