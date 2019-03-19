@@ -34,8 +34,6 @@ public class MyTaskDialog extends AbstractFullDialog {
 
 				// TODO remove the comma before the last word and replace with "and"
 				String rooms = "";
-				allTasks.add("Wohnzimmer");
-				allTasks.add("Schlafzimmer");
 				for (Iterator<String> iterator = allTasks.iterator(); iterator.hasNext();) {
 					rooms += iterator.next() + ", ";
 				}
