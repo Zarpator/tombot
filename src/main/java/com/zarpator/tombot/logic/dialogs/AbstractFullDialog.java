@@ -35,7 +35,7 @@ public abstract class AbstractFullDialog {
 		if (dialogFinished) {
 			dbChatWhereCommandWasGiven.resetOngoingDialog();
 		} else {
-			dbChatWhereCommandWasGiven.incrementCurrentState(stateIncrement);
+			incrementCurrentState(dbChatWhereCommandWasGiven, stateIncrement);
 		}
 		
 		stateIncrement = stateIncrementStandard;
@@ -45,5 +45,11 @@ public abstract class AbstractFullDialog {
 
 	protected abstract class DialogState {
 		public abstract MiddlelayerHttpAnswerForTelegram doLogic();
+	}
+	
+	private void incrementCurrentState(DbChat chat, int increment) {
+		int state = chat.getCurrentStateInOngoingDialog();
+		state = state + increment;
+		chat.setCurrentStateInOngoingDialog(state);
 	}
 }
