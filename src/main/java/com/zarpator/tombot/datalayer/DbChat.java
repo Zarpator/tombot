@@ -45,9 +45,4 @@ public class DbChat {
 	public void setCurrentStateInOngoingDialog(int currentStateInOngoingDialog) {
 		this.currentStateInOngoingDialog = currentStateInOngoingDialog;
 	}
-	
-	public void resetOngoingDialog() {
-		this.setCurrentOngoingDialog(null);
-		this.setCurrentStateInOngoingDialog(0);
-	}
 }
