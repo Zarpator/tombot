@@ -1,6 +1,7 @@
 package com.zarpator.tombot.datalayer;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.zarpator.tombot.logic.EntityNotFoundException;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmChat;
@@ -11,6 +12,8 @@ public class DataAccessObject {
 	private static ArrayList<DbChat> allChats = new ArrayList<DbChat>();
 	private static ArrayList<DbUser> allUsers = new ArrayList<DbUser>();
 	public static ArrayList<DbHousehold> allHouseholds = new ArrayList<DbHousehold>();
+	public static ArrayList<Grocer> allGroceries = new ArrayList<Grocer>();
+
 
 	public boolean isAlreadyInDialog(int id) {
 		return false;
@@ -115,6 +118,16 @@ public class DataAccessObject {
 			}
 		}
 		return false;
+	}
+
+	public List<Grocer> getAllGroceriesbyUserId(int id) {
+		List<Grocer> groceries = new ArrayList<>();
+		for (Grocer grocer : allGroceries){
+			if (grocer.getOwnerId() == id) {
+				groceries.add(grocer);
+			}
+		}
+		return groceries;
 	}
 
 }
