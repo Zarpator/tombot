@@ -5,6 +5,7 @@ import com.zarpator.tombot.datalayer.DbChat;
 import com.zarpator.tombot.datalayer.DbUser;
 import com.zarpator.tombot.logic.dialogs.AbstractFullDialog;
 import com.zarpator.tombot.logic.dialogs.AnswerwithusersownmessageDialog;
+import com.zarpator.tombot.logic.dialogs.FertigDialog;
 import com.zarpator.tombot.logic.dialogs.GroceriesDialog;
 import com.zarpator.tombot.logic.dialogs.MyTaskDialog;
 import com.zarpator.tombot.logic.dialogs.StartDialog;
@@ -71,6 +72,10 @@ public class DialogHandler {
 		case "/mytask":
 			dialogToDo = new MyTaskDialog(message, myDAO, dbChatWhereCommandWasGiven, dbUserWhoSentMessage);
 			dbChatWhereCommandWasGiven.setCurrentOngoingDialog("/mytask");
+			break;
+		case "/fertig":
+			dialogToDo = new FertigDialog(message, myDAO, dbChatWhereCommandWasGiven, dbUserWhoSentMessage);
+			dbChatWhereCommandWasGiven.setCurrentOngoingDialog("/fertig");
 			break;
 		case "/mygroceries":
 			dialogToDo = new GroceriesDialog(message, myDAO, dbChatWhereCommandWasGiven, dbUserWhoSentMessage);
