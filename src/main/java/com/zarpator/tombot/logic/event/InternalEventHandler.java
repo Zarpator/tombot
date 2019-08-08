@@ -33,7 +33,7 @@ public class InternalEventHandler extends Thread {
 					waitingTime = 0;
 				}
 
-				logger.log("warten: " + waitingTime + " milliseconds");
+				logger.log("wait for: " + waitingTime + " milliseconds");
 				try {
 					Thread.sleep(waitingTime);
 				} catch (InterruptedException e) {
@@ -66,6 +66,8 @@ public class InternalEventHandler extends Thread {
 
 	private void sendMessage(Event nearestUpcomingEvent) {
 		nearestUpcomingEvent.getMessage();
+		
+		//TODO send queued message
 	}
 
 	private long getWaitingTime(Event event) {
