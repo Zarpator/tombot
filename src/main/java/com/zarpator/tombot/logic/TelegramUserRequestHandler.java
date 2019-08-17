@@ -34,24 +34,6 @@ public class TelegramUserRequestHandler extends UserRequestHandler {
 	@Override
 	protected void send(ArrayList<HttpMessageForTelegramServers> messagesForServer) {
 		
-		myConnectionHandler.sendMessagesToServer(messagesForServer, TgmAnswerWithMessage.class);
-
-		// old implementation
-//		if (messagesForServer != null && messagesForServer.isEmpty()) {
-//			System.out.println("No Messages to send to Telegram");
-//			return;
-//		}
-//		
-//		for (HttpMessageForTelegramServers message : messagesForServer) {
-//			if (message != null) {
-//
-//				TgmAnswerWithMessage returnedResponseFromTgmServer = myAPIAccessHandler.sendMessageToServer(message,
-//						TgmAnswerWithMessage.class);
-//				System.out.println("Telegramserver ist ok: " + returnedResponseFromTgmServer.isOk());
-//				System.out.println("Nachricht: " + returnedResponseFromTgmServer.getResult().getText());
-//			} else {
-//				System.out.println("Received empty Message!");
-//			}
-//		}
+		myConnectionHandler.sendMultipleMessagesToServer(messagesForServer, TgmAnswerWithMessage.class);
 	}
 }

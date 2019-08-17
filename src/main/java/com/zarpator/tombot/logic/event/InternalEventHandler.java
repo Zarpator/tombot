@@ -4,14 +4,19 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import com.zarpator.tombot.servicelayer.BotServerConnectionHandler;
+import com.zarpator.tombot.servicelayer.receiving.TgmAnswerWithMessage;
 import com.zarpator.tombot.servicelayer.sending.HttpMessageForTelegramServers;
 import com.zarpator.tombot.utils.Logger;
 
 public class InternalEventHandler extends Thread {
 	Logger logger = new Logger();
+	BotServerConnectionHandler myConnectionHandler;
+	
 	private EventList events;
 
-	public InternalEventHandler() {
+	public InternalEventHandler(BotServerConnectionHandler ConnectionHandler) {
+		this.myConnectionHandler = ConnectionHandler;
 		events = new EventList();
 	}
 
@@ -65,9 +70,9 @@ public class InternalEventHandler extends Thread {
 	}
 
 	private void sendMessage(Event nearestUpcomingEvent) {
-		nearestUpcomingEvent.getMessage();
+		HttpMessageForTelegramServers message = nearestUpcomingEvent.getMessage();
 		
-		//TODO send queued message
+		myConnectionHandler.sendSingleMessageToServer(message, TgmAnswerWithMessage.class);
 	}
 
 	private long getWaitingTime(Event event) {

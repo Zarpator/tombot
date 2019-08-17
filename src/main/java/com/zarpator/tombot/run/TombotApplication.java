@@ -8,6 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.zarpator.tombot.logic.TelegramUserRequestHandler;
 import com.zarpator.tombot.logic.UserRequestHandler;
 import com.zarpator.tombot.logic.event.InternalEventHandler;
+import com.zarpator.tombot.servicelayer.TelegramBotServerConnectionHandler;
+import com.zarpator.tombot.servicelayer.sending.HttpMessageForTelegramServers;
+import com.zarpator.tombot.servicelayer.sending.PresetMessageForSendMessage;
 
 @SpringBootApplication
 public class TombotApplication {
@@ -16,17 +19,17 @@ public class TombotApplication {
 		UserRequestHandler userRequestHandler = new TelegramUserRequestHandler();
 		userRequestHandler.start();
 		
-//		InternalEventHandler internalEventHandler = new InternalEventHandler();
-//		internalEventHandler.addEvent(LocalDateTime.of(2019, 8, 9, 0, 55, 30), null);
-//		internalEventHandler.addEvent(LocalDateTime.of(2018, 07, 9, 21, 30, 30), null);
-//		internalEventHandler.addEvent(LocalDateTime.of(2016, 07, 10, 21, 30, 30), null);
-//		internalEventHandler.addEvent(LocalDateTime.of(2017, 07, 10, 21, 30, 30), null);
-//		internalEventHandler.addEvent(LocalDateTime.of(2020, 07, 14, 17, 05, 00), null);
-//		internalEventHandler.start();
-//		
-//		try { TimeUnit.SECONDS.sleep(2);} catch(InterruptedException e) {}
-//		
-//		internalEventHandler.addEvent(LocalDateTime.of(2019, 07, 14, 17, 04, 00), null);
+		InternalEventHandler internalEventHandler = new InternalEventHandler(new TelegramBotServerConnectionHandler());
+		internalEventHandler.addEvent(LocalDateTime.of(2019, 8, 9, 0, 55, 30), new HttpMessageForTelegramServers(new PresetMessageForSendMessage("2019", 94320006)));
+		internalEventHandler.addEvent(LocalDateTime.of(2018, 07, 9, 21, 30, 30), new HttpMessageForTelegramServers(new PresetMessageForSendMessage("2018", 94320006)));
+		internalEventHandler.addEvent(LocalDateTime.of(2016, 07, 10, 21, 30, 30), new HttpMessageForTelegramServers(new PresetMessageForSendMessage("2016", 94320006)));
+		internalEventHandler.addEvent(LocalDateTime.of(2017, 07, 10, 21, 30, 30), new HttpMessageForTelegramServers(new PresetMessageForSendMessage("2017", 94320006)));
+		internalEventHandler.addEvent(LocalDateTime.of(2020, 07, 14, 17, 05, 00), new HttpMessageForTelegramServers(new PresetMessageForSendMessage("2020", 94320006)));
+		internalEventHandler.start();
+		
+		try { TimeUnit.SECONDS.sleep(10);} catch(InterruptedException e) {}
+		
+		internalEventHandler.addEvent(LocalDateTime.of(2019, 07, 14, 19, 05, 00), new HttpMessageForTelegramServers(new PresetMessageForSendMessage("2019 später", 94320006)));
 		
 	}
 

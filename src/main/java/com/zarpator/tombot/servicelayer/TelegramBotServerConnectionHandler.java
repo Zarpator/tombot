@@ -13,7 +13,7 @@ import com.zarpator.tombot.servicelayer.sending.PresetMessageForGetUpdates;
 public class TelegramBotServerConnectionHandler implements BotServerConnectionHandler {
 
 	public TgmUpdate[] fetchNewUserRequests() {
-		TgmAnswerWithUpdateArray answer = this.sendMessageToServer(
+		TgmAnswerWithUpdateArray answer = this.sendSingleMessageToServer(
 				new HttpMessageForTelegramServers(new PresetMessageForGetUpdates()), TgmAnswerWithUpdateArray.class);
 
 		return answer.getResult();
@@ -21,7 +21,7 @@ public class TelegramBotServerConnectionHandler implements BotServerConnectionHa
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public void sendMessagesToServer(ArrayList<HttpMessageForTelegramServers> messagesForServer,
+	public void sendMultipleMessagesToServer(ArrayList<HttpMessageForTelegramServers> messagesForServer,
 			Class typeOfTheExpectedTgmAnswers) {
 		
 		if (messagesForServer != null && messagesForServer.isEmpty()) {
@@ -31,7 +31,7 @@ public class TelegramBotServerConnectionHandler implements BotServerConnectionHa
 		
 		for (HttpMessageForTelegramServers message : messagesForServer) {
 			if (message != null) {
-				TgmAnswerSuperClass returnedResponseFromTgmServer = this.sendMessageToServer(message,
+				TgmAnswerSuperClass returnedResponseFromTgmServer = this.sendSingleMessageToServer(message,
 						typeOfTheExpectedTgmAnswers);
 				System.out.println("Telegramserver ist ok: " + returnedResponseFromTgmServer.isOk());
 			} else {
@@ -40,7 +40,7 @@ public class TelegramBotServerConnectionHandler implements BotServerConnectionHa
 		}
 	}
 
-	private <T extends TgmAnswerSuperClass> T sendMessageToServer(HttpMessageForTelegramServers message,
+	public <T extends TgmAnswerSuperClass> T sendSingleMessageToServer(HttpMessageForTelegramServers message,
 			Class<T> typeOfTheTgmAnswer) {
 
 		String url = buildURL(message);
