@@ -2,18 +2,18 @@ package com.zarpator.tombot.logic;
 
 import java.util.ArrayList;
 
+import com.zarpator.tombot.servicelayer.BotServerConnectionHandler;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUpdate;
 import com.zarpator.tombot.servicelayer.sending.HttpMessageForTelegramServers;
 import com.zarpator.tombot.utils.Logger;
 
 public abstract class UserRequestHandler extends Thread {
 	protected Logger logger;
+	BotServerConnectionHandler myConnectionHandler;
 
 	public UserRequestHandler() {
 		logger = new Logger();
 	}
-
-	protected abstract TgmUpdate[] fetch();
 
 	protected abstract ArrayList<HttpMessageForTelegramServers> handle(TgmUpdate[] userRequests);
 
@@ -29,7 +29,7 @@ public abstract class UserRequestHandler extends Thread {
 			// log
 			logger.log("Fetch user requests");
 
-			TgmUpdate[] userMessages = this.fetch();
+			TgmUpdate[] userMessages = myConnectionHandler.fetchNewUserRequests();
 
 			logger.log("Do the logic for the requests");
 

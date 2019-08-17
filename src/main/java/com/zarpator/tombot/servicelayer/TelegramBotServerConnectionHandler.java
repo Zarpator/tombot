@@ -1,5 +1,7 @@
 package com.zarpator.tombot.servicelayer;
 
+import java.util.ArrayList;
+
 import org.springframework.web.client.RestTemplate;
 
 import com.zarpator.tombot.servicelayer.receiving.TgmAnswerSuperClass;
@@ -8,7 +10,7 @@ import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUpdate;
 import com.zarpator.tombot.servicelayer.sending.HttpMessageForTelegramServers;
 import com.zarpator.tombot.servicelayer.sending.PresetMessageForGetUpdates;
 
-public class TelegramAPIAccessHandler implements APIAccessHandler {
+public class TelegramBotServerConnectionHandler implements BotServerConnectionHandler {
 
 	public TgmUpdate[] fetchNewUserRequests() {
 		TgmAnswerWithUpdateArray answer = this.sendMessageToServer(
@@ -17,7 +19,28 @@ public class TelegramAPIAccessHandler implements APIAccessHandler {
 		return answer.getResult();
 	}
 
-	public <T extends TgmAnswerSuperClass> T sendMessageToServer(HttpMessageForTelegramServers message,
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public void sendMessagesToServer(ArrayList<HttpMessageForTelegramServers> messagesForServer,
+			Class typeOfTheExpectedTgmAnswers) {
+		
+		if (messagesForServer != null && messagesForServer.isEmpty()) {
+			System.out.println("No Messages to send to Telegram");
+			return;
+		}
+		
+		for (HttpMessageForTelegramServers message : messagesForServer) {
+			if (message != null) {
+				TgmAnswerSuperClass returnedResponseFromTgmServer = this.sendMessageToServer(message,
+						typeOfTheExpectedTgmAnswers);
+				System.out.println("Telegramserver ist ok: " + returnedResponseFromTgmServer.isOk());
+			} else {
+				System.out.println("Received empty Message!");
+			}
+		}
+	}
+
+	private <T extends TgmAnswerSuperClass> T sendMessageToServer(HttpMessageForTelegramServers message,
 			Class<T> typeOfTheTgmAnswer) {
 
 		String url = buildURL(message);
