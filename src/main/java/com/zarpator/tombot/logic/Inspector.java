@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.zarpator.tombot.datalayer.DataAccessObject;
 import com.zarpator.tombot.datalayer.DbChat;
 import com.zarpator.tombot.datalayer.DbUser;
+import com.zarpator.tombot.logic.event.InternalEventHandler;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmChat;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUpdate;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUser;
@@ -13,9 +14,16 @@ import com.zarpator.tombot.servicelayer.sending.PresetMessageForSendMessage;
 
 public class Inspector {
 
-	DialogHandler myDH = new DialogHandler();
-	DataAccessObject myDAO = new DataAccessObject();
-
+	DialogHandler myDH;
+	DataAccessObject myDAO;
+	InternalEventHandler myEventHandler;
+	
+	Inspector(InternalEventHandler myEventHandler){
+		this.myEventHandler = myEventHandler;
+		this.myDH = new DialogHandler(this.myEventHandler);
+		this.myDAO = new DataAccessObject();
+	}
+	
 	// Does specific routine for the TgmUpdates in the Answer and returns a messages
 	// per Update
 

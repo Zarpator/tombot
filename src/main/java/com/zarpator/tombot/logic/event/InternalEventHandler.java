@@ -65,6 +65,7 @@ public class InternalEventHandler extends Thread {
 	}
 
 	public void addEvent(LocalDateTime timestamp, HttpMessageForTelegramServers message) {
+		logger.log("addEvent called!");
 		this.interrupt();
 		events.insertNewEvent(new Event(timestamp, message));
 	}

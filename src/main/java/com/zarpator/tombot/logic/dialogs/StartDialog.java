@@ -1,24 +1,29 @@
 package com.zarpator.tombot.logic.dialogs;
 
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.zarpator.tombot.datalayer.DataAccessObject;
-import com.zarpator.tombot.datalayer.Day;
 import com.zarpator.tombot.datalayer.DbChat;
 import com.zarpator.tombot.datalayer.DbHousehold;
 import com.zarpator.tombot.datalayer.DbUser;
 import com.zarpator.tombot.logic.EntityNotFoundException;
 import com.zarpator.tombot.logic.MiddlelayerHttpAnswerForTelegram;
+import com.zarpator.tombot.logic.event.InternalEventHandler;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmMessage;
-
-
+import com.zarpator.tombot.servicelayer.sending.HttpMessageForTelegramServers;
+import com.zarpator.tombot.servicelayer.sending.PresetMessageForSendMessage;
 
 public class StartDialog extends AbstractFullDialog {
 
-	public StartDialog(TgmMessage message, DataAccessObject dao, DbChat chat, DbUser user) {
-		super(message, dao, chat, user);
+	public StartDialog(TgmMessage message, DataAccessObject dao, DbChat chat, DbUser user,
+			InternalEventHandler myEventHandler) {
+		super(message, dao, chat, user, myEventHandler);
 		this.mySpecificDialogStates = new DialogState[] { new RoomAskingDialogState(), new YourNextRoomDialogState(),
 				new CleaningFrequencyDialogState(), new StartDayDialogState(), new FinishSetupDialogState() };
 	}
@@ -120,7 +125,7 @@ public class StartDialog extends AbstractFullDialog {
 
 				messageText = messageText.substring(0, messageText.length() - 2);
 				messageForDialogHandler.setText(messageText);
-				
+
 				return messageForDialogHandler;
 			}
 		}
@@ -153,8 +158,8 @@ public class StartDialog extends AbstractFullDialog {
 				return messageForDialogHandler;
 			}
 
-			messageForDialogHandler
-					.setText("An welchem Wochentag sollen die Räume immer geputzt sein?\n\n" + "\"MO, DI, MI, DO, FR, SA, SO\"");
+			messageForDialogHandler.setText(
+					"An welchem Wochentag sollen die Räume immer geputzt sein?\n\n" + "\"MO, DI, MI, DO, FR, SA, SO\"");
 
 			return messageForDialogHandler;
 		}
@@ -176,29 +181,29 @@ public class StartDialog extends AbstractFullDialog {
 				return messageForDialogHandler;
 			}
 
-			Day lastDayOfPeriod;
+			DayOfWeek lastDayOfPeriod;
 
 			switch (userInput) {
 			case "MO":
-				lastDayOfPeriod = Day.MO;
+				lastDayOfPeriod = DayOfWeek.MONDAY;
 				break;
 			case "DI":
-				lastDayOfPeriod = Day.TU;
+				lastDayOfPeriod = DayOfWeek.TUESDAY;
 				break;
 			case "MI":
-				lastDayOfPeriod = Day.WE;
+				lastDayOfPeriod = DayOfWeek.WEDNESDAY;
 				break;
 			case "DO":
-				lastDayOfPeriod = Day.TU;
+				lastDayOfPeriod = DayOfWeek.THURSDAY;
 				break;
 			case "FR":
-				lastDayOfPeriod = Day.FR;
+				lastDayOfPeriod = DayOfWeek.FRIDAY;
 				break;
 			case "SA":
-				lastDayOfPeriod = Day.SA;
+				lastDayOfPeriod = DayOfWeek.SATURDAY;
 				break;
 			case "SO":
-				lastDayOfPeriod = Day.SU;
+				lastDayOfPeriod = DayOfWeek.SUNDAY;
 				break;
 			default:
 				messageForDialogHandler.setText("Ich habe deine Eingabe nicht erkannt. Gib noch mal ein.");
@@ -208,8 +213,26 @@ public class StartDialog extends AbstractFullDialog {
 
 			household.setLastDayOfPeriod(lastDayOfPeriod);
 
+			// set timestamp to one day before must finish
+			DayOfWeek notificationDay = lastDayOfPeriod.minus(1);
+			LocalDateTime dateTime = LocalDateTime.now();
+			LocalDateTime notificationTimestamp = dateTime.with(TemporalAdjusters.next(notificationDay));
 			
-			messageForDialogHandler.setText("Danke! Es ist jetzt alles eingerichtet. Frag mich doch mal was :)");
+			List<String> roomsList = dbUserWhoSentMessage.getRoomsToDo();
+			String rooms = "";
+			for (Iterator<String> iterator = roomsList.iterator(); iterator.hasNext();) {
+				rooms += iterator.next() + ", ";
+			}
+			String roomsToClean = rooms.substring(0, rooms.length() - 2);
+			
+			// write reminder message
+			HttpMessageForTelegramServers reminderMessage = new HttpMessageForTelegramServers(new PresetMessageForSendMessage("In einem Tag musst du mit Putzen fertig sein, jetzt aber hinne!\n\n" + roomsToClean, dbUserWhoSentMessage.getId()));
+
+			// add the event to the eventhandler
+			myEventHandler.addEvent(notificationTimestamp, reminderMessage);
+
+			messageForDialogHandler.setText(
+					"Danke! Es ist jetzt alles eingerichtet. Wenn du wieder putzen solltest, schreibe ich dir");
 
 			dialogFinished = true;
 			return messageForDialogHandler;

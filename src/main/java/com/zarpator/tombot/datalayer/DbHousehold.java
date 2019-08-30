@@ -1,5 +1,6 @@
 package com.zarpator.tombot.datalayer;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 
 public class DbHousehold {
@@ -18,14 +19,14 @@ public class DbHousehold {
 	public void setCleaningPeriod(int cleaningPeriod) {
 		this.cleaningPeriod = cleaningPeriod;
 	}
-	public Day getLastDayOfPeriod() {
+	public DayOfWeek getLastDayOfPeriod() {
 		return lastDayOfPeriod;
 	}
-	public void setLastDayOfPeriod(Day lastDayOfPeriod) {
+	public void setLastDayOfPeriod(DayOfWeek lastDayOfPeriod) {
 		this.lastDayOfPeriod = lastDayOfPeriod;
 	}
 	public ArrayList<String> getRooms() {
 		return rooms;
 	}
-	private Day lastDayOfPeriod;
+	private DayOfWeek lastDayOfPeriod;
 }

@@ -14,9 +14,6 @@ public class MiddlelayerHttpAnswerForTelegram {
 	public void setChatId(int chatId) {
 		this.chatId = chatId;
 	}
-	public static MiddlelayerHttpAnswerForTelegram getNomessage() {
-		return noMessage;
-	}
 	private String text;
 	private int chatId;
 	

@@ -5,21 +5,27 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.zarpator.tombot.logic.TelegramUserRequestHandler;
 import com.zarpator.tombot.logic.UserRequestHandler;
 import com.zarpator.tombot.logic.event.InternalEventHandler;
-import com.zarpator.tombot.servicelayer.TelegramBotServerConnectionHandler;
 import com.zarpator.tombot.servicelayer.sending.HttpMessageForTelegramServers;
 import com.zarpator.tombot.servicelayer.sending.PresetMessageForSendMessage;
 
 @SpringBootApplication
 public class TombotApplication {
+	
+	public static UserRequestHandler userRequestHandler;
+	public static InternalEventHandler internalEventHandler;
 
 	public static void main(String[] args) {
-		UserRequestHandler userRequestHandler = new TelegramUserRequestHandler();
+		
+		TelegramHandlerFactory handlerFactory = new TelegramHandlerFactory();
+		
+		handlerFactory.instantiateHandlers();
+		internalEventHandler = handlerFactory.getInternalEventHandler();
+		userRequestHandler = handlerFactory.getUserRequestHandler();
+		
 		userRequestHandler.start();
 		
-		InternalEventHandler internalEventHandler = new InternalEventHandler(new TelegramBotServerConnectionHandler());
 		internalEventHandler.addEvent(LocalDateTime.of(2019, 8, 9, 0, 55, 30), new HttpMessageForTelegramServers(new PresetMessageForSendMessage("2019", 94320006)));
 		internalEventHandler.addEvent(LocalDateTime.of(2018, 07, 9, 21, 30, 30), new HttpMessageForTelegramServers(new PresetMessageForSendMessage("2018", 94320006)));
 		internalEventHandler.addEvent(LocalDateTime.of(2016, 07, 10, 21, 30, 30), new HttpMessageForTelegramServers(new PresetMessageForSendMessage("2016", 94320006)));

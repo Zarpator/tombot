@@ -2,6 +2,7 @@ package com.zarpator.tombot.logic;
 
 import java.util.ArrayList;
 
+import com.zarpator.tombot.logic.event.InternalEventHandler;
 import com.zarpator.tombot.servicelayer.TelegramBotServerConnectionHandler;
 import com.zarpator.tombot.servicelayer.receiving.TgmAnswerWithMessage;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUpdate;
@@ -10,9 +11,10 @@ import com.zarpator.tombot.servicelayer.sending.HttpMessageForTelegramServers;
 public class TelegramUserRequestHandler extends UserRequestHandler {
 	protected Inspector myInspector;
 
-	public TelegramUserRequestHandler() {
+	public TelegramUserRequestHandler(InternalEventHandler myEventHandler) {
+		super(myEventHandler);
 		myConnectionHandler = new TelegramBotServerConnectionHandler();
-		myInspector = new Inspector();
+		myInspector = new Inspector(this.myEventHandler);
 	}
 
 	protected ArrayList<HttpMessageForTelegramServers> handle(TgmUpdate[] messages) {
