@@ -69,7 +69,7 @@ public class HttpMessageForTelegramServers {
 
 		try {
 			
-			File jsonWithToken = new File("src/main/java/com/zarpator/tombot/servicelayer/sending/localInfo.json");
+			File jsonWithToken = new File("localInfo.json");
 			info = new ObjectMapper().readValue(jsonWithToken, LocalInfo.class);
 			return info.getToken();
 			
