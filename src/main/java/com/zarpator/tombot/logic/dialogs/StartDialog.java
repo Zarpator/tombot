@@ -11,8 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 import com.zarpator.tombot.datalayer.DataAccessObject;
 import com.zarpator.tombot.datalayer.DbChat;
 import com.zarpator.tombot.datalayer.DbHousehold;
+import com.zarpator.tombot.datalayer.DbRoom;
 import com.zarpator.tombot.datalayer.DbUser;
-import com.zarpator.tombot.logic.EntityNotFoundException;
 import com.zarpator.tombot.logic.MiddlelayerHttpAnswerForTelegram;
 import com.zarpator.tombot.logic.event.InternalEventHandler;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmMessage;
@@ -64,20 +64,16 @@ public class StartDialog extends AbstractFullDialog {
 				return MiddlelayerHttpAnswerForTelegram.noMessage;
 			} else {
 
-				DbHousehold userHousehold;
-				try {
-					userHousehold = myDAO.getHouseholdById(householdId);
-					List<String> rooms = userHousehold.getRooms();
-					if (rooms.isEmpty()) {
-						messageForDialogHandler.setText(
-								"Deine WG muss schon Räume haben wenn das hier zwischen uns funktionieren soll");
-						stateIncrement = 0;
-					} else {
-						messageForDialogHandler.setChatId(dbChatWhereCommandWasGiven.getId());
-						messageForDialogHandler.setText("Welchen dieser Räume musst du als nächstes putzen?");
-					}
-				} catch (EntityNotFoundException e) {
-					messageForDialogHandler.setText(e.getMessage());
+				List<DbRoom> rooms = myDAO.getRoomsByHouseholdId(householdId);
+				
+				messageForDialogHandler.setChatId(dbChatWhereCommandWasGiven.getId());
+
+				if (rooms.isEmpty()) {
+					messageForDialogHandler
+							.setText("Deine WG muss schon Räume haben wenn das hier zwischen uns funktionieren soll");
+					stateIncrement = 0;
+				} else {
+					messageForDialogHandler.setText("Welchen dieser Räume musst du als nächstes putzen?");
 				}
 				return messageForDialogHandler;
 			}
@@ -93,7 +89,9 @@ public class StartDialog extends AbstractFullDialog {
 			int householdId = dbUserWhoSentMessage.getHouseholdId();
 			boolean roomIsInHousehold;
 
-			roomIsInHousehold = myDAO.roomIsInHousehold(userInput, householdId);
+			int roomId = myDAO.getRoomByName(userInput).getId();
+
+			roomIsInHousehold = myDAO.roomIsInHousehold(roomId, householdId);
 
 			if (roomIsInHousehold) {
 
@@ -109,18 +107,10 @@ public class StartDialog extends AbstractFullDialog {
 				messageForDialogHandler.setChatId(dbChatWhereCommandWasGiven.getId());
 				String messageText = "Diesen Raum müsst ihr in eurer WG nicht putzen. Nenne einen Raum, den du putzen musst:\n\n";
 
-				DbHousehold household;
-				try {
-					household = myDAO.getHouseholdById(householdId);
-				} catch (EntityNotFoundException e) {
-					messageForDialogHandler.setText("Haushalt nicht gefunden. Interner Fehler");
-					return messageForDialogHandler;
-				}
+				List<DbRoom> roomsInHousehold = myDAO.getRoomsByHouseholdId(householdId);
 
-				List<String> roomsInHousehold = household.getRooms();
-
-				for (String room : roomsInHousehold) {
-					messageText += room + ", ";
+				for (DbRoom room : roomsInHousehold) {
+					messageText += room.getName() + ", ";
 				}
 
 				messageText = messageText.substring(0, messageText.length() - 2);
@@ -149,14 +139,8 @@ public class StartDialog extends AbstractFullDialog {
 			int cleaningPeriod = Integer.parseInt(userInput);
 			DbHousehold householdOfUser;
 
-			try {
-				householdOfUser = myDAO.getHouseholdById(dbUserWhoSentMessage.getHouseholdId());
-				householdOfUser.setCleaningPeriod(cleaningPeriod);
-			} catch (EntityNotFoundException e) {
-				System.out.println("Haushalt nicht gefunden. Interner Fehler");
-				messageForDialogHandler.setText("Haushalt nicht gefunden. Interner Fehler");
-				return messageForDialogHandler;
-			}
+			householdOfUser = myDAO.getHouseholdById(dbUserWhoSentMessage.getHouseholdId());
+			householdOfUser.setCleaningPeriod(cleaningPeriod);
 
 			messageForDialogHandler.setText(
 					"An welchem Wochentag sollen die Räume immer geputzt sein?\n\n" + "\"MO, DI, MI, DO, FR, SA, SO\"");
@@ -173,10 +157,8 @@ public class StartDialog extends AbstractFullDialog {
 			messageForDialogHandler.setChatId(dbUserWhoSentMessage.getId());
 			String userInput = messageToProcess.getText();
 
-			DbHousehold household;
-			try {
-				household = myDAO.getHouseholdById(dbUserWhoSentMessage.getHouseholdId());
-			} catch (EntityNotFoundException e) {
+			DbHousehold household = myDAO.getHouseholdById(dbUserWhoSentMessage.getHouseholdId());
+			if (household == null) {
 				messageForDialogHandler.setText("Haushalt nicht gefunden. Interner Fehler");
 				return messageForDialogHandler;
 			}
@@ -217,22 +199,25 @@ public class StartDialog extends AbstractFullDialog {
 			DayOfWeek notificationDay = lastDayOfPeriod.minus(1);
 			LocalDateTime dateTime = LocalDateTime.now();
 			LocalDateTime notificationTimestamp = dateTime.with(TemporalAdjusters.next(notificationDay));
-			
+
 			List<String> roomsList = dbUserWhoSentMessage.getRoomsToDo();
 			String rooms = "";
 			for (Iterator<String> iterator = roomsList.iterator(); iterator.hasNext();) {
 				rooms += iterator.next() + ", ";
 			}
 			String roomsToClean = rooms.substring(0, rooms.length() - 2);
-			
+
 			// write reminder message
-			HttpMessageForTelegramServers reminderMessage = new HttpMessageForTelegramServers(new PresetMessageForSendMessage("In einem Tag musst du mit Putzen fertig sein, jetzt aber hinne!\n\n" + roomsToClean, dbUserWhoSentMessage.getId()));
+			HttpMessageForTelegramServers reminderMessage = new HttpMessageForTelegramServers(
+					new PresetMessageForSendMessage(
+							"In einem Tag musst du mit Putzen fertig sein, jetzt aber hinne!\n\n" + roomsToClean,
+							dbUserWhoSentMessage.getId()));
 
 			// add the event to the eventhandler
 			myEventHandler.addEvent(notificationTimestamp, reminderMessage);
 
 			messageForDialogHandler.setText(
-					"Danke! Es ist jetzt alles eingerichtet. Wenn du wieder putzen solltest, schreibe ich dir");
+					"Danke! Es ist jetzt alles eingerichtet. Wenn du wieder putzen musst, schreibe ich dir");
 
 			dialogFinished = true;
 			return messageForDialogHandler;
