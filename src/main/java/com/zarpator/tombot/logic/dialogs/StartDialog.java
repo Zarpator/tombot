@@ -58,7 +58,7 @@ public class StartDialog extends AbstractFullDialog {
 
 			if (!userInput.equals("Fertig")) {
 
-				myDAO.addRoomToHousehold(householdId, messageToProcess.getText());
+				myDAO.addNewRoom(householdId, messageToProcess.getText());
 
 				stateIncrement = 0;
 				return MiddlelayerHttpAnswerForTelegram.noMessage;

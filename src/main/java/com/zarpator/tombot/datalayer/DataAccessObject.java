@@ -126,12 +126,6 @@ public class DataAccessObject {
 
 		return room;
 	}
-
-	public boolean addRoomToHousehold(int householdId, String roomName) {
-		DbRoom room = this.addNewRoom(householdId, roomName);
-		
-		return this.addRoomToHousehold(householdId, room.getId());	
-	}	
 	
 	public boolean addRoomToHousehold(int householdId, int roomId) {
 		DbRoomToHousehold roomToHousehold = new DbRoomToHousehold(householdId, roomId);
