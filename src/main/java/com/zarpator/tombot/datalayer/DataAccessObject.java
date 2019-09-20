@@ -15,6 +15,8 @@ public class DataAccessObject {
 	private static ArrayList<Grocer> allGroceries = new ArrayList<Grocer>();
 	private static ArrayList<DbRoom> allRooms = new ArrayList<DbRoom>();
 	private static ArrayList<DbRoomToHousehold> allRoomsToHouseholds = new ArrayList<DbRoomToHousehold>();
+	private static ArrayList<DbRoomToUser> allRoomsToUsers = new ArrayList<DbRoomToUser>();
+	private static ArrayList<DbUserToHousehold> allUsersToHouseholds = new ArrayList<DbUserToHousehold>();
 
 
 	public boolean isAlreadyInDialog(int id) {
@@ -30,7 +32,7 @@ public class DataAccessObject {
 		throw new EntityNotFoundException();
 	}
 
-	public DbUser getDbUserById(int id) throws EntityNotFoundException {
+	public DbUser getUserById(int id) throws EntityNotFoundException {
 
 		for (DbUser user : allUsers) {
 			if (user.getId() == id) {
@@ -40,11 +42,31 @@ public class DataAccessObject {
 
 		throw new EntityNotFoundException();
 	}
+	
+	private List<Integer> getUserIdsOfHousehold(int householdId) {
+		List<Integer> userIds = new ArrayList<Integer>();
+		for (DbUserToHousehold userToHousehold : allUsersToHouseholds) {
+			if (userToHousehold.getHouseholdId() == householdId) {
+				userIds.add(userToHousehold.getUserId());
+			}
+		}
+		
+		return null;
+	}
 
 	public DbHousehold getHouseholdById(int id) {
 		for (DbHousehold household : allHouseholds) {
 			if (household.getId() == id) {
 				return household;
+			}
+		}
+		return null;
+	}
+
+	private DbHousehold getHouseholdByRoomId(int roomId) {
+		for (DbRoomToHousehold roomToHousehold : allRoomsToHouseholds) {
+			if (roomToHousehold.getRoomId() == roomId) {
+				return this.getHouseholdById(roomToHousehold.getHouseholdId());
 			}
 		}
 		return null;
@@ -67,15 +89,6 @@ public class DataAccessObject {
 		}
 		return null;
 	}
-	
-	private DbHousehold getHouseholdByRoomId(int roomId) {
-		for (DbRoomToHousehold roomToHousehold : allRoomsToHouseholds) {
-			if (roomToHousehold.getRoomId() == roomId) {
-				return this.getHouseholdById(roomToHousehold.getHouseholdId());
-			}
-		}
-		return null;
-	}
 
 	public ArrayList<DbRoom> getRoomsByHouseholdId(int householdId) {
 		ArrayList<DbRoom> rooms = new ArrayList<>();
@@ -86,6 +99,16 @@ public class DataAccessObject {
 			}
 		}
 		return rooms;
+	}
+	
+	public List<Grocer> getGroceriesOfUser(int userId) {
+		List<Grocer> groceries = new ArrayList<>();
+		for (Grocer grocer : allGroceries){
+			if (grocer.getOwnerId() == userId) {
+				groceries.add(grocer);
+			}
+		}
+		return groceries;
 	}
 
 	public void addNewUser(TgmUser unpersistedTgmUser) {
@@ -105,32 +128,52 @@ public class DataAccessObject {
 		allChats.add(newChatInDb);
 	}
 
-	public int addNewHousehold() {
-		DbHousehold newHouseholdInDb = new DbHousehold();
+	public int addHousehold() {
+		DbHousehold household = new DbHousehold();
 
-		int idOfNewHousehold = getNewHouseholdId();
+		int householdId = getNewHouseholdId();
 
-		newHouseholdInDb.setId(idOfNewHousehold);
+		household.setId(householdId);
 
-		allHouseholds.add(newHouseholdInDb);
+		allHouseholds.add(household);
 
-		return idOfNewHousehold;
+		return householdId;
 	}
 	
-	public DbRoom addNewRoom(int householdId, String name) {
+	public DbRoom addRoom(int householdId, String name) {
 		DbRoom room = new DbRoom(getNewRoomId(), name);
 		
-		this.addRoomToHousehold(householdId, room.getId());
-		
 		allRooms.add(room);
+		
+		this.addRoomToHousehold(householdId, room.getId());
+		this.addRoomToUsersOfItsHousehold(room.getId());
 
 		return room;
 	}
 	
-	public boolean addRoomToHousehold(int householdId, int roomId) {
+	private boolean addRoomToHousehold(int householdId, int roomId) {
 		DbRoomToHousehold roomToHousehold = new DbRoomToHousehold(householdId, roomId);
 		
 		allRoomsToHouseholds.add(roomToHousehold);
+		
+		return true;
+	}
+	
+	private void addRoomToUsersOfItsHousehold(int roomId) {
+		DbHousehold household = this.getHouseholdByRoomId(roomId);
+		List<Integer> userIds = this.getUserIdsOfHousehold(household.getId());
+		
+		for (Integer userId : userIds) {
+			DbRoomToUser roomToUser = new DbRoomToUser(roomId, userId);
+			allRoomsToUsers.add(roomToUser);
+		}
+		
+	}
+
+	public boolean addUserToHousehold(int userId, int householdId) {
+		DbUserToHousehold userToHousehold = new DbUserToHousehold(userId, householdId);
+		
+		allUsersToHouseholds.add(userToHousehold);
 		
 		return true;
 	}
@@ -170,17 +213,4 @@ public class DataAccessObject {
 			return true;
 		}
 	}
-
-	public List<Grocer> getAllGroceriesbyUserId(int id) {
-		List<Grocer> groceries = new ArrayList<>();
-		for (Grocer grocer : allGroceries){
-			if (grocer.getOwnerId() == id) {
-				groceries.add(grocer);
-			}
-		}
-		return groceries;
-	}
-
-	
-
 }

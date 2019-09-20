@@ -31,7 +31,7 @@ public class DialogHandler {
 		DbUser dbUserWhoSentMessage;
 		int idOfUserWhoSentMessage = message.getFrom().getId();
 		try {
-			dbUserWhoSentMessage = myDAO.getDbUserById(idOfUserWhoSentMessage);
+			dbUserWhoSentMessage = myDAO.getUserById(idOfUserWhoSentMessage);
 		} catch (EntityNotFoundException e) {
 			messageToReturnToInspector = new MiddlelayerHttpAnswerForTelegram();
 			messageToReturnToInspector.setText(

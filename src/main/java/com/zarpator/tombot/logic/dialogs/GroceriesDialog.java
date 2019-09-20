@@ -26,7 +26,7 @@ public class GroceriesDialog extends AbstractFullDialog {
 
 			messageForDialogHandler.setChatId(dbChatWhereCommandWasGiven.getId());
 			
-			List<Grocer> groceries = myDAO.getAllGroceriesbyUserId(dbUserWhoSentMessage.getId());
+			List<Grocer> groceries = myDAO.getGroceriesOfUser(dbUserWhoSentMessage.getId());
 
 			if (groceries.isEmpty()) {
 				messageForDialogHandler.setText("Es gibt nix einzukaufen :)");

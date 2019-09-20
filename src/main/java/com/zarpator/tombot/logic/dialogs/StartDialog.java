@@ -50,7 +50,7 @@ public class StartDialog extends AbstractFullDialog {
 
 			int householdId;
 			if (dbUserWhoSentMessage.getHouseholdId() == 0) {
-				householdId = myDAO.addNewHousehold();
+				householdId = myDAO.addHousehold();
 				dbUserWhoSentMessage.setHouseholdId(householdId);
 			} else {
 				householdId = dbUserWhoSentMessage.getHouseholdId();
@@ -58,7 +58,7 @@ public class StartDialog extends AbstractFullDialog {
 
 			if (!userInput.equals("Fertig")) {
 
-				myDAO.addNewRoom(householdId, messageToProcess.getText());
+				myDAO.addRoom(householdId, messageToProcess.getText());
 
 				stateIncrement = 0;
 				return MiddlelayerHttpAnswerForTelegram.noMessage;
