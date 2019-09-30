@@ -7,7 +7,6 @@ import com.zarpator.tombot.logic.EntityNotFoundException;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmChat;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUser;
 
-
 public class DataAccessObject {
 	private static ArrayList<DbChat> allChats = new ArrayList<DbChat>();
 	private static ArrayList<DbUser> allUsers = new ArrayList<DbUser>();
@@ -17,7 +16,6 @@ public class DataAccessObject {
 	private static ArrayList<DbRoomToHousehold> allRoomsToHouseholds = new ArrayList<DbRoomToHousehold>();
 	private static ArrayList<DbRoomToUser> allRoomsToUsers = new ArrayList<DbRoomToUser>();
 	private static ArrayList<DbUserToHousehold> allUsersToHouseholds = new ArrayList<DbUserToHousehold>();
-
 
 	public boolean isAlreadyInDialog(int id) {
 		return false;
@@ -42,7 +40,7 @@ public class DataAccessObject {
 
 		throw new EntityNotFoundException();
 	}
-	
+
 	private List<Integer> getUserIdsOfHousehold(int householdId) {
 		List<Integer> userIds = new ArrayList<Integer>();
 		for (DbUserToHousehold userToHousehold : allUsersToHouseholds) {
@@ -50,8 +48,8 @@ public class DataAccessObject {
 				userIds.add(userToHousehold.getUserId());
 			}
 		}
-		
-		return null;
+
+		return userIds;
 	}
 
 	public DbHousehold getHouseholdById(int id) {
@@ -72,7 +70,16 @@ public class DataAccessObject {
 		return null;
 	}
 
-	public DbRoom getRoomById(int roomId){
+	public DbHousehold getHouseholdByUserId(int userId) {
+		for (DbUserToHousehold userToHousehold : allUsersToHouseholds) {
+			if (userToHousehold.getUserId() == userId) {
+				return this.getHouseholdById(userToHousehold.getHouseholdId());
+			}
+		}
+		return null;
+	}
+
+	public DbRoom getRoomById(int roomId) {
 		for (DbRoom room : allRooms) {
 			if (room.getId() == roomId) {
 				return room;
@@ -81,7 +88,7 @@ public class DataAccessObject {
 		return null;
 	}
 
-	public DbRoom getRoomByName(String roomName){
+	public DbRoom getRoomByName(String roomName) {
 		for (DbRoom room : allRooms) {
 			if (room.getName().equals(roomName)) {
 				return room;
@@ -100,15 +107,34 @@ public class DataAccessObject {
 		}
 		return rooms;
 	}
-	
+
 	public List<Grocer> getGroceriesOfUser(int userId) {
 		List<Grocer> groceries = new ArrayList<>();
-		for (Grocer grocer : allGroceries){
+		for (Grocer grocer : allGroceries) {
 			if (grocer.getOwnerId() == userId) {
 				groceries.add(grocer);
 			}
 		}
 		return groceries;
+	}
+
+	public DbRoomToUser getRoomToUser(int userId, String roomName) {
+		for (DbRoomToUser roomToUser : allRoomsToUsers) {
+			if (roomToUser.getUserId() == userId && roomToUser.getRoomId() == getRoomByName(roomName).getId()) {
+				return roomToUser;
+			}
+		}
+		return null;
+	}
+
+	public List<DbRoomToUser> getRoomsToUser(int userId) {
+		List<DbRoomToUser> roomsToUsers = new ArrayList<DbRoomToUser>();
+		for (DbRoomToUser roomToUser : allRoomsToUsers) {
+			if (roomToUser.getUserId() == userId) {
+				roomsToUsers.add(roomToUser);
+			}
+		}
+		return roomsToUsers;
 	}
 
 	public void addNewUser(TgmUser unpersistedTgmUser) {
@@ -128,53 +154,51 @@ public class DataAccessObject {
 		allChats.add(newChatInDb);
 	}
 
-	public int addHousehold() {
+	public int addHousehold(int userId) {
 		DbHousehold household = new DbHousehold();
-
-		int householdId = getNewHouseholdId();
-
-		household.setId(householdId);
-
+		household.setId(getNewHouseholdId());
 		allHouseholds.add(household);
 
-		return householdId;
+		addUserToHousehold(userId, household.getId());
+
+		return household.getId();
 	}
-	
+
 	public DbRoom addRoom(int householdId, String name) {
 		DbRoom room = new DbRoom(getNewRoomId(), name);
-		
+
 		allRooms.add(room);
-		
+
 		this.addRoomToHousehold(householdId, room.getId());
 		this.addRoomToUsersOfItsHousehold(room.getId());
 
 		return room;
 	}
-	
+
 	private boolean addRoomToHousehold(int householdId, int roomId) {
 		DbRoomToHousehold roomToHousehold = new DbRoomToHousehold(householdId, roomId);
-		
+
 		allRoomsToHouseholds.add(roomToHousehold);
-		
+
 		return true;
 	}
-	
+
 	private void addRoomToUsersOfItsHousehold(int roomId) {
 		DbHousehold household = this.getHouseholdByRoomId(roomId);
 		List<Integer> userIds = this.getUserIdsOfHousehold(household.getId());
-		
+
 		for (Integer userId : userIds) {
 			DbRoomToUser roomToUser = new DbRoomToUser(roomId, userId);
 			allRoomsToUsers.add(roomToUser);
 		}
-		
+
 	}
 
 	public boolean addUserToHousehold(int userId, int householdId) {
 		DbUserToHousehold userToHousehold = new DbUserToHousehold(userId, householdId);
-		
+
 		allUsersToHouseholds.add(userToHousehold);
-		
+
 		return true;
 	}
 
@@ -185,7 +209,7 @@ public class DataAccessObject {
 			return allHouseholds.size() + 1;
 		}
 	}
-	
+
 	private int getNewRoomId() {
 		if (allRooms == null || allRooms.isEmpty()) {
 			return 1;
@@ -206,8 +230,8 @@ public class DataAccessObject {
 		DbHousehold household = this.getHouseholdByRoomId(roomId);
 
 		household = this.getHouseholdById(householdId);
-		
-		if(household == null || household.getId() != householdId) {
+
+		if (household == null || household.getId() != householdId) {
 			return false;
 		} else {
 			return true;

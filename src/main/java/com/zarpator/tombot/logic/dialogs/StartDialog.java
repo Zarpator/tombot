@@ -12,6 +12,8 @@ import com.zarpator.tombot.datalayer.DataAccessObject;
 import com.zarpator.tombot.datalayer.DbChat;
 import com.zarpator.tombot.datalayer.DbHousehold;
 import com.zarpator.tombot.datalayer.DbRoom;
+import com.zarpator.tombot.datalayer.DbRoomToUser;
+import com.zarpator.tombot.datalayer.DbRoomToUser.Task;
 import com.zarpator.tombot.datalayer.DbUser;
 import com.zarpator.tombot.logic.MiddlelayerHttpAnswerForTelegram;
 import com.zarpator.tombot.logic.event.InternalEventHandler;
@@ -24,17 +26,31 @@ public class StartDialog extends AbstractFullDialog {
 	public StartDialog(TgmMessage message, DataAccessObject dao, DbChat chat, DbUser user,
 			InternalEventHandler myEventHandler) {
 		super(message, dao, chat, user, myEventHandler);
-		this.mySpecificDialogStates = new DialogState[] { new RoomAskingDialogState(), new YourNextRoomDialogState(),
-				new CleaningFrequencyDialogState(), new StartDayDialogState(), new FinishSetupDialogState() };
+		this.mySpecificDialogStates = new DialogState[] { /* new HouseholdDialog(), */ new RoomAskingDialogState(),
+				new YourNextRoomDialogState(), new CleaningFrequencyDialogState(), new StartDayDialogState(),
+				new FinishSetupDialogState() };
 	}
+
+//	private class HouseholdDialog extends DialogState {
+//		@Override
+//		public MiddlelayerHttpAnswerForTelegram doLogic() {
+//			MiddlelayerHttpAnswerForTelegram messageForDialogHandler = new MiddlelayerHttpAnswerForTelegram();
+//
+//			messageForDialogHandler.setChatId(dbChatWhereCommandWasGiven.getId());
+//			messageForDialogHandler.setText("Hallo! Ist deine WG schon bei mir eingerichtet worden?\n\n" +
+//			"\"Ja\" / \"Nein\"");
+//
+//			return messageForDialogHandler;
+//		}
+//	}
 
 	private class RoomAskingDialogState extends DialogState {
 		@Override
 		public MiddlelayerHttpAnswerForTelegram doLogic() {
 			MiddlelayerHttpAnswerForTelegram messageForDialogHandler = new MiddlelayerHttpAnswerForTelegram();
-
+			
 			messageForDialogHandler.setChatId(dbChatWhereCommandWasGiven.getId());
-			messageForDialogHandler.setText("Hallo! Welche Räume müsst ihr in eurer WG putzen?\n"
+			messageForDialogHandler.setText("Hallo! Welche Räume müsst ihr denn in eurer WG putzen?\n"
 					+ "Schreib mir einfach in jeder Nachricht ein Zimmer, bestätige mit \"Fertig\"");
 
 			return messageForDialogHandler;
@@ -47,13 +63,13 @@ public class StartDialog extends AbstractFullDialog {
 
 			MiddlelayerHttpAnswerForTelegram messageForDialogHandler = new MiddlelayerHttpAnswerForTelegram();
 			String userInput = messageToProcess.getText();
+			int userId = messageToProcess.getFrom().getId();
 
 			int householdId;
-			if (dbUserWhoSentMessage.getHouseholdId() == 0) {
-				householdId = myDAO.addHousehold();
-				dbUserWhoSentMessage.setHouseholdId(householdId);
+			if (myDAO.getHouseholdByUserId(userId) == null) {
+				householdId = myDAO.addHousehold(messageToProcess.getFrom().getId());
 			} else {
-				householdId = dbUserWhoSentMessage.getHouseholdId();
+				householdId = myDAO.getHouseholdByUserId(userId).getId();
 			}
 
 			if (!userInput.equals("Fertig")) {
@@ -65,7 +81,7 @@ public class StartDialog extends AbstractFullDialog {
 			} else {
 
 				List<DbRoom> rooms = myDAO.getRoomsByHouseholdId(householdId);
-				
+
 				messageForDialogHandler.setChatId(dbChatWhereCommandWasGiven.getId());
 
 				if (rooms.isEmpty()) {
@@ -86,7 +102,7 @@ public class StartDialog extends AbstractFullDialog {
 
 			MiddlelayerHttpAnswerForTelegram messageForDialogHandler = new MiddlelayerHttpAnswerForTelegram();
 			String userInput = messageToProcess.getText();
-			int householdId = dbUserWhoSentMessage.getHouseholdId();
+			int householdId = myDAO.getHouseholdByUserId(dbUserWhoSentMessage.getId()).getId();
 			boolean roomIsInHousehold;
 
 			int roomId = myDAO.getRoomByName(userInput).getId();
@@ -94,8 +110,10 @@ public class StartDialog extends AbstractFullDialog {
 			roomIsInHousehold = myDAO.roomIsInHousehold(roomId, householdId);
 
 			if (roomIsInHousehold) {
-
-				dbUserWhoSentMessage.addToDoRoom(userInput);
+				
+				DbRoomToUser roomToUser = myDAO.getRoomToUser(dbUserWhoSentMessage.getId(), userInput);
+				roomToUser.setTask(Task.RESPONSIBLE);
+//				dbUserWhoSentMessage.addToDoRoom(userInput);
 
 				messageForDialogHandler.setChatId(dbChatWhereCommandWasGiven.getId());
 				messageForDialogHandler.setText("Wie lang ist die Frist bei euch, bis ein Raum geputzt werden muss?\n"
@@ -139,7 +157,7 @@ public class StartDialog extends AbstractFullDialog {
 			int cleaningPeriod = Integer.parseInt(userInput);
 			DbHousehold householdOfUser;
 
-			householdOfUser = myDAO.getHouseholdById(dbUserWhoSentMessage.getHouseholdId());
+			householdOfUser = myDAO.getHouseholdById(myDAO.getHouseholdByUserId(dbUserWhoSentMessage.getId()).getId());
 			householdOfUser.setCleaningPeriod(cleaningPeriod);
 
 			messageForDialogHandler.setText(
@@ -157,7 +175,7 @@ public class StartDialog extends AbstractFullDialog {
 			messageForDialogHandler.setChatId(dbUserWhoSentMessage.getId());
 			String userInput = messageToProcess.getText();
 
-			DbHousehold household = myDAO.getHouseholdById(dbUserWhoSentMessage.getHouseholdId());
+			DbHousehold household = myDAO.getHouseholdById(myDAO.getHouseholdByUserId(dbUserWhoSentMessage.getId()).getId());
 			if (household == null) {
 				messageForDialogHandler.setText("Haushalt nicht gefunden. Interner Fehler");
 				return messageForDialogHandler;
@@ -199,11 +217,12 @@ public class StartDialog extends AbstractFullDialog {
 			DayOfWeek notificationDay = lastDayOfPeriod.minus(1);
 			LocalDateTime dateTime = LocalDateTime.now();
 			LocalDateTime notificationTimestamp = dateTime.with(TemporalAdjusters.next(notificationDay));
-
-			List<String> roomsList = dbUserWhoSentMessage.getRoomsToDo();
+			
+			int householdId = myDAO.getHouseholdByUserId(dbUserWhoSentMessage.getId()).getId();
+			List<DbRoom> roomsList = myDAO.getRoomsByHouseholdId(householdId);
 			String rooms = "";
-			for (Iterator<String> iterator = roomsList.iterator(); iterator.hasNext();) {
-				rooms += iterator.next() + ", ";
+			for (Iterator<DbRoom> iterator = roomsList.iterator(); iterator.hasNext();) {
+				rooms += iterator.next().getName() + ", ";
 			}
 			String roomsToClean = rooms.substring(0, rooms.length() - 2);
 
@@ -216,8 +235,8 @@ public class StartDialog extends AbstractFullDialog {
 			// add the event to the eventhandler
 			myEventHandler.addEvent(notificationTimestamp, reminderMessage);
 
-			messageForDialogHandler.setText(
-					"Danke! Es ist jetzt alles eingerichtet. Wenn du wieder putzen musst, schreibe ich dir");
+			messageForDialogHandler
+					.setText("Danke! Es ist jetzt alles eingerichtet. Wenn du wieder putzen musst, schreibe ich dir");
 
 			dialogFinished = true;
 			return messageForDialogHandler;

@@ -1,10 +1,14 @@
 package com.zarpator.tombot.logic.dialogs;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import com.zarpator.tombot.datalayer.DataAccessObject;
 import com.zarpator.tombot.datalayer.DbChat;
+import com.zarpator.tombot.datalayer.DbRoom;
+import com.zarpator.tombot.datalayer.DbRoomToUser;
+import com.zarpator.tombot.datalayer.DbRoomToUser.Task;
 import com.zarpator.tombot.datalayer.DbUser;
 import com.zarpator.tombot.logic.MiddlelayerHttpAnswerForTelegram;
 import com.zarpator.tombot.logic.event.InternalEventHandler;
@@ -27,7 +31,15 @@ public class MyTaskDialog extends AbstractFullDialog {
 
 			messageForDialogHandler.setChatId(dbChatWhereCommandWasGiven.getId());
 
-			List<String> allTasks = dbUserWhoSentMessage.getRoomsToDo();
+			List<DbRoomToUser> roomsToUser = myDAO.getRoomsToUser(dbUserWhoSentMessage.getId());
+			List<String> allTasks = new ArrayList<String>();
+			
+			for (DbRoomToUser roomToUser : roomsToUser) {
+				if (roomToUser.getTask() == Task.RESPONSIBLE) {
+					DbRoom room = myDAO.getRoomById(roomToUser.getRoomId());
+					allTasks.add(room.getName());
+				}
+			}
 
 			if (allTasks == null || allTasks.isEmpty()) {
 				messageForDialogHandler.setText("Du hast gerade nichts zu tun :)");
