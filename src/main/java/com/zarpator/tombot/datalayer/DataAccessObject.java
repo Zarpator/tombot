@@ -3,6 +3,7 @@ package com.zarpator.tombot.datalayer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.zarpator.tombot.datalayer.DbRoomToUser.Task;
 import com.zarpator.tombot.logic.EntityNotFoundException;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmChat;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUser;
@@ -189,6 +190,7 @@ public class DataAccessObject {
 
 		for (Integer userId : userIds) {
 			DbRoomToUser roomToUser = new DbRoomToUser(roomId, userId);
+			roomToUser.setTask(Task.NOTRESPONSIBLE);
 			allRoomsToUsers.add(roomToUser);
 		}
 
