@@ -6,7 +6,7 @@ import java.util.List;
 import com.zarpator.tombot.datalayer.DataAccessObject;
 import com.zarpator.tombot.datalayer.DbChat;
 import com.zarpator.tombot.datalayer.DbUser;
-import com.zarpator.tombot.datalayer.Grocer;
+import com.zarpator.tombot.datalayer.DbGrocer;
 import com.zarpator.tombot.logic.MiddlelayerHttpAnswerForTelegram;
 import com.zarpator.tombot.logic.event.InternalEventHandler;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmMessage;
@@ -26,7 +26,7 @@ public class GroceriesDialog extends AbstractFullDialog {
 
 			messageForDialogHandler.setChatId(dbChatWhereCommandWasGiven.getId());
 			
-			List<Grocer> groceries = myDAO.getGroceriesOfUser(dbUserWhoSentMessage.getId());
+			List<DbGrocer> groceries = myDAO.getGroceriesOfUser(dbUserWhoSentMessage.getId());
 
 			if (groceries.isEmpty()) {
 				messageForDialogHandler.setText("Es gibt nix einzukaufen :)");
@@ -34,7 +34,7 @@ public class GroceriesDialog extends AbstractFullDialog {
 
 				// TODO remove the comma before the last word and replace with "and"
 				String groceriesToBuy = "";
-				for (Iterator<Grocer> iterator = groceries.iterator(); iterator.hasNext();) {
+				for (Iterator<DbGrocer> iterator = groceries.iterator(); iterator.hasNext();) {
 					groceriesToBuy += iterator.next() + ", ";
 				}
 				String finalGroceriesText = groceriesToBuy.substring(0, groceriesToBuy.length() - 2);

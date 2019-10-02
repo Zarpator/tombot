@@ -1,6 +1,6 @@
 package com.zarpator.tombot.datalayer;
 
-public class Grocer {
+public class DbGrocer {
 	private int ownerId;
 	private String name;
 	public int getOwnerId() {

@@ -12,7 +12,7 @@ public class DataAccessObject {
 	private static ArrayList<DbChat> allChats = new ArrayList<DbChat>();
 	private static ArrayList<DbUser> allUsers = new ArrayList<DbUser>();
 	private static ArrayList<DbHousehold> allHouseholds = new ArrayList<DbHousehold>();
-	private static ArrayList<Grocer> allGroceries = new ArrayList<Grocer>();
+	private static ArrayList<DbGrocer> allGroceries = new ArrayList<DbGrocer>();
 	private static ArrayList<DbRoom> allRooms = new ArrayList<DbRoom>();
 	private static ArrayList<DbRoomToHousehold> allRoomsToHouseholds = new ArrayList<DbRoomToHousehold>();
 	private static ArrayList<DbRoomToUser> allRoomsToUsers = new ArrayList<DbRoomToUser>();
@@ -109,9 +109,9 @@ public class DataAccessObject {
 		return rooms;
 	}
 
-	public List<Grocer> getGroceriesOfUser(int userId) {
-		List<Grocer> groceries = new ArrayList<>();
-		for (Grocer grocer : allGroceries) {
+	public List<DbGrocer> getGroceriesOfUser(int userId) {
+		List<DbGrocer> groceries = new ArrayList<>();
+		for (DbGrocer grocer : allGroceries) {
 			if (grocer.getOwnerId() == userId) {
 				groceries.add(grocer);
 			}

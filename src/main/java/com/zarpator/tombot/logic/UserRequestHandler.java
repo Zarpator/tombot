@@ -26,29 +26,19 @@ public abstract class UserRequestHandler extends Thread {
 
 	@Override
 	public void run() {
-
-		// log
 		logger.log("A new UserRequestHandler started in a new Thread");
 		while (true) {
 
-			// log
-			logger.log("Fetch user requests");
-
 			TgmUpdate[] userMessages = myConnectionHandler.fetchNewUserRequests();
-
-			logger.log("Do the logic for the requests");
 
 			// do the specific logic for the request
 			ArrayList<HttpMessageForTelegramServers> serverMessages = this.handle(userMessages);
-
-			logger.log("Send the reactions to the api");
 
 			this.send(serverMessages);
 
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

@@ -3,6 +3,7 @@ package com.zarpator.tombot.logic.event;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import com.zarpator.tombot.servicelayer.BotServerConnectionHandler;
 import com.zarpator.tombot.servicelayer.receiving.TgmAnswerWithMessage;
@@ -101,6 +102,17 @@ public class InternalEventHandler extends Thread {
 			events.add(newEvent);
 			events.sort(new EventComparator());
 		}
-	}
 
+		private class EventComparator implements Comparator<Event>{
+
+			@Override
+			public int compare(Event event1, Event event2) {
+				
+				int comparison = event1.getTimestamp().compareTo(event2.getTimestamp());
+				
+				return comparison;
+			}
+
+		}
+	}
 }

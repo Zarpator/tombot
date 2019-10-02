@@ -10,7 +10,6 @@ public class TelegramHandlerFactory {
 	private InternalEventHandler internalEventHandler;
 
 	void initiateHandlers(){
-		// Order important, because eventhandler is needed for requesthandler
 		this.internalEventHandler = new InternalEventHandler(new TelegramBotServerConnectionHandler());
 		this.userRequestHandler = new TelegramUserRequestHandler(this.internalEventHandler);
 	}
