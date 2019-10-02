@@ -1,14 +1,10 @@
-package com.zarpator.tombot.logic;
+package com.zarpator.tombot.logic.dialogs;
 
 import com.zarpator.tombot.datalayer.DataAccessObject;
 import com.zarpator.tombot.datalayer.DbChat;
 import com.zarpator.tombot.datalayer.DbUser;
-import com.zarpator.tombot.logic.dialogs.AbstractFullDialog;
-import com.zarpator.tombot.logic.dialogs.AnswerwithusersownmessageDialog;
-import com.zarpator.tombot.logic.dialogs.FertigDialog;
-import com.zarpator.tombot.logic.dialogs.GroceriesDialog;
-import com.zarpator.tombot.logic.dialogs.MyTaskDialog;
-import com.zarpator.tombot.logic.dialogs.StartDialog;
+import com.zarpator.tombot.logic.EntityNotFoundException;
+import com.zarpator.tombot.logic.MiddlelayerHttpAnswerForTelegram;
 import com.zarpator.tombot.logic.event.InternalEventHandler;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmMessage;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUpdate;

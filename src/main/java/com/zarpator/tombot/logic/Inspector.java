@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.zarpator.tombot.datalayer.DataAccessObject;
 import com.zarpator.tombot.datalayer.DbChat;
 import com.zarpator.tombot.datalayer.DbUser;
+import com.zarpator.tombot.logic.dialogs.DialogHandler;
 import com.zarpator.tombot.logic.event.InternalEventHandler;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmChat;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUpdate;

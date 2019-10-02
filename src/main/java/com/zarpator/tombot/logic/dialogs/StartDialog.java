@@ -102,18 +102,12 @@ public class StartDialog extends AbstractFullDialog {
 
 			MiddlelayerHttpAnswerForTelegram messageForDialogHandler = new MiddlelayerHttpAnswerForTelegram();
 			String userInput = messageToProcess.getText();
-			int householdId = myDAO.getHouseholdByUserId(dbUserWhoSentMessage.getId()).getId();
-			boolean roomIsInHousehold;
 
-			int roomId = myDAO.getRoomByName(userInput).getId();
+			DbRoomToUser roomToUser = myDAO.getRoomToUser(dbUserWhoSentMessage.getId(), userInput);
 
-			roomIsInHousehold = myDAO.roomIsInHousehold(roomId, householdId);
-
-			if (roomIsInHousehold) {
+			if (roomToUser != null) {
 				
-				DbRoomToUser roomToUser = myDAO.getRoomToUser(dbUserWhoSentMessage.getId(), userInput);
 				roomToUser.setTask(Task.RESPONSIBLE);
-//				dbUserWhoSentMessage.addToDoRoom(userInput);
 
 				messageForDialogHandler.setChatId(dbChatWhereCommandWasGiven.getId());
 				messageForDialogHandler.setText("Wie lang ist die Frist bei euch, bis ein Raum geputzt werden muss?\n"
@@ -125,6 +119,7 @@ public class StartDialog extends AbstractFullDialog {
 				messageForDialogHandler.setChatId(dbChatWhereCommandWasGiven.getId());
 				String messageText = "Diesen Raum müsst ihr in eurer WG nicht putzen. Nenne einen Raum, den du putzen musst:\n\n";
 
+				int householdId = myDAO.getHouseholdByUserId(dbUserWhoSentMessage.getId()).getId();
 				List<DbRoom> roomsInHousehold = myDAO.getRoomsByHouseholdId(householdId);
 
 				for (DbRoom room : roomsInHousehold) {

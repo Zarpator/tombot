@@ -88,15 +88,15 @@ public class DataAccessObject {
 		}
 		return null;
 	}
-
-	public DbRoom getRoomByName(String roomName) {
-		for (DbRoom room : allRooms) {
-			if (room.getName().equals(roomName)) {
-				return room;
-			}
-		}
-		return null;
-	}
+//
+//	public DbRoom getRoomByName(String roomName, int householdId) {
+//		for (DbRoom room : allRooms) {
+//			if (room.getName().equals(roomName)) {
+//				return room;
+//			}
+//		}
+//		return null;
+//	}
 
 	public ArrayList<DbRoom> getRoomsByHouseholdId(int householdId) {
 		ArrayList<DbRoom> rooms = new ArrayList<>();
@@ -121,8 +121,11 @@ public class DataAccessObject {
 
 	public DbRoomToUser getRoomToUser(int userId, String roomName) {
 		for (DbRoomToUser roomToUser : allRoomsToUsers) {
-			if (roomToUser.getUserId() == userId && roomToUser.getRoomId() == getRoomByName(roomName).getId()) {
-				return roomToUser;
+			if (roomToUser.getUserId() == userId) {
+				DbRoom roomInUsersHousehold = this.getRoomById(roomToUser.getRoomId());
+				if (roomInUsersHousehold.getName().equals(roomName)) {
+					return roomToUser;
+				}
 			}
 		}
 		return null;
