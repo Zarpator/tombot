@@ -88,15 +88,6 @@ public class DataAccessObject {
 		}
 		return null;
 	}
-//
-//	public DbRoom getRoomByName(String roomName, int householdId) {
-//		for (DbRoom room : allRooms) {
-//			if (room.getName().equals(roomName)) {
-//				return room;
-//			}
-//		}
-//		return null;
-//	}
 
 	public ArrayList<DbRoom> getRoomsByHouseholdId(int householdId) {
 		ArrayList<DbRoom> rooms = new ArrayList<>();
