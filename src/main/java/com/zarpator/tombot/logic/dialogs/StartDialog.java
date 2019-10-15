@@ -222,8 +222,7 @@ public class StartDialog extends AbstractFullDialog {
 			}
 			String roomsToClean = rooms.substring(0, rooms.length() - 2);
 
-			// TODO start automatic room forwarding job
-			myLogic.addRoomForwardingJob(householdId);
+			myLogic.addRoomForwardingJob(householdId, household.getLastDayOfPeriod());
 			
 			// write reminder message
 			HttpMessageForTelegramServers reminderMessage = new HttpMessageForTelegramServers(
