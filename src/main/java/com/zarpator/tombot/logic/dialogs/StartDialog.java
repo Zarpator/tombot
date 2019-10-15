@@ -15,6 +15,7 @@ import com.zarpator.tombot.datalayer.DbRoom;
 import com.zarpator.tombot.datalayer.DbRoomToUser;
 import com.zarpator.tombot.datalayer.DbRoomToUser.Task;
 import com.zarpator.tombot.datalayer.DbUser;
+import com.zarpator.tombot.logic.Logic;
 import com.zarpator.tombot.logic.MiddlelayerHttpAnswerForTelegram;
 import com.zarpator.tombot.logic.event.InternalEventHandler;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmMessage;
@@ -24,8 +25,8 @@ import com.zarpator.tombot.servicelayer.sending.PresetMessageForSendMessage;
 public class StartDialog extends AbstractFullDialog {
 
 	public StartDialog(TgmMessage message, DataAccessObject dao, DbChat chat, DbUser user,
-			InternalEventHandler myEventHandler) {
-		super(message, dao, chat, user, myEventHandler);
+			InternalEventHandler myEventHandler, Logic myLogic) {
+		super(message, dao, chat, user, myEventHandler, myLogic);
 		this.mySpecificDialogStates = new DialogState[] { /* new HouseholdDialog(), */ new RoomAskingDialogState(),
 				new YourNextRoomDialogState(), new CleaningFrequencyDialogState(), new StartDayDialogState(),
 				new FinishSetupDialogState() };
@@ -222,7 +223,7 @@ public class StartDialog extends AbstractFullDialog {
 			String roomsToClean = rooms.substring(0, rooms.length() - 2);
 
 			// TODO start automatic room forwarding job
-			//LogicHandler.addRoomForwardingJob(household.getLastDayOfPeriod());
+			myLogic.addRoomForwardingJob(householdId);
 			
 			// write reminder message
 			HttpMessageForTelegramServers reminderMessage = new HttpMessageForTelegramServers(

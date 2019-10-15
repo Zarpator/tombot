@@ -13,11 +13,13 @@ public abstract class UserRequestHandler extends Thread {
 	protected Logger logger;
 	BotServerConnectionHandler myConnectionHandler;
 	InternalEventHandler myEventHandler;
+	Logic myLogic;
 
-	public UserRequestHandler(InternalEventHandler myEventHandler) {
+	public UserRequestHandler(InternalEventHandler myEventHandler, Logic myLogic) {
 		logger = new Logger();
 		myConnectionHandler = new TelegramBotServerConnectionHandler();
 		this.myEventHandler = myEventHandler;
+		this.myLogic = myLogic;
 	}
 
 	protected abstract ArrayList<HttpMessageForTelegramServers> handle(TgmUpdate[] userRequests);

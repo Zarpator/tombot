@@ -18,10 +18,12 @@ public class Inspector {
 	DialogHandler myDH;
 	DataAccessObject myDAO;
 	InternalEventHandler myEventHandler;
+	Logic myLogic;
 	
-	Inspector(InternalEventHandler myEventHandler){
+	Inspector(InternalEventHandler myEventHandler, Logic myLogic){
 		this.myEventHandler = myEventHandler;
-		this.myDH = new DialogHandler(this.myEventHandler);
+		this.myLogic = myLogic;
+		this.myDH = new DialogHandler(this.myEventHandler, this.myLogic);
 		this.myDAO = new DataAccessObject();
 	}
 	

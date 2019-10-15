@@ -4,6 +4,7 @@ import com.zarpator.tombot.datalayer.DataAccessObject;
 import com.zarpator.tombot.datalayer.DbChat;
 import com.zarpator.tombot.datalayer.DbUser;
 import com.zarpator.tombot.logic.EntityNotFoundException;
+import com.zarpator.tombot.logic.Logic;
 import com.zarpator.tombot.logic.MiddlelayerHttpAnswerForTelegram;
 import com.zarpator.tombot.logic.event.InternalEventHandler;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmMessage;
@@ -13,9 +14,11 @@ public class DialogHandler {
 
 	DataAccessObject myDAO = new DataAccessObject();
 	InternalEventHandler myEventHandler;
+	Logic myLogic;
 	
-	public DialogHandler(InternalEventHandler myEventHandler) {
+	public DialogHandler(InternalEventHandler myEventHandler, Logic myLogic) {
 		this.myEventHandler = myEventHandler;
+		this.myLogic = myLogic;
 	}
 
 	public MiddlelayerHttpAnswerForTelegram processUpdateByGettingDbEntitiesAndDelegating(TgmUpdate update) {
@@ -68,23 +71,23 @@ public class DialogHandler {
 		AbstractFullDialog dialogToDo;
 		switch (currentDialogOfChat) {
 		case "/start":
-			dialogToDo = new StartDialog(message, myDAO, dbChatWhereCommandWasGiven, dbUserWhoSentMessage, myEventHandler);
+			dialogToDo = new StartDialog(message, myDAO, dbChatWhereCommandWasGiven, dbUserWhoSentMessage, myEventHandler, myLogic);
 			dbChatWhereCommandWasGiven.setCurrentOngoingDialog("/start");
 			break;
 		case "/mytask":
-			dialogToDo = new MyTaskDialog(message, myDAO, dbChatWhereCommandWasGiven, dbUserWhoSentMessage, myEventHandler);
+			dialogToDo = new MyTaskDialog(message, myDAO, dbChatWhereCommandWasGiven, dbUserWhoSentMessage, myEventHandler, myLogic);
 			dbChatWhereCommandWasGiven.setCurrentOngoingDialog("/mytask");
 			break;
 		case "/fertig":
-			dialogToDo = new FertigDialog(message, myDAO, dbChatWhereCommandWasGiven, dbUserWhoSentMessage, myEventHandler);
+			dialogToDo = new FertigDialog(message, myDAO, dbChatWhereCommandWasGiven, dbUserWhoSentMessage, myEventHandler, myLogic);
 			dbChatWhereCommandWasGiven.setCurrentOngoingDialog("/fertig");
 			break;
 		case "/mygroceries":
-			dialogToDo = new GroceriesDialog(message, myDAO, dbChatWhereCommandWasGiven, dbUserWhoSentMessage, myEventHandler);
+			dialogToDo = new GroceriesDialog(message, myDAO, dbChatWhereCommandWasGiven, dbUserWhoSentMessage, myEventHandler, myLogic);
 			dbChatWhereCommandWasGiven.setCurrentOngoingDialog("/mygroceries");
 		default:
 			System.out.println("no known command in currentOngoingDialog of the Chat or in Message of the User found");
-			dialogToDo = new AnswerwithusersownmessageDialog(message, myDAO, dbChatWhereCommandWasGiven, dbUserWhoSentMessage, myEventHandler);
+			dialogToDo = new AnswerwithusersownmessageDialog(message, myDAO, dbChatWhereCommandWasGiven, dbUserWhoSentMessage, myEventHandler, myLogic);
 			dbChatWhereCommandWasGiven.setCurrentOngoingDialog("/getanswerwithusersownmessage");
 			break;
 		}

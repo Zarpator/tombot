@@ -11,10 +11,10 @@ import com.zarpator.tombot.servicelayer.sending.HttpMessageForTelegramServers;
 public class TelegramUserRequestHandler extends UserRequestHandler {
 	protected Inspector myInspector;
 
-	public TelegramUserRequestHandler(InternalEventHandler myEventHandler) {
-		super(myEventHandler);
+	public TelegramUserRequestHandler(InternalEventHandler myEventHandler, Logic myLogic) {
+		super(myEventHandler, myLogic);
 		myConnectionHandler = new TelegramBotServerConnectionHandler();
-		myInspector = new Inspector(this.myEventHandler);
+		myInspector = new Inspector(this.myEventHandler, this.myLogic);
 	}
 
 	protected ArrayList<HttpMessageForTelegramServers> handle(TgmUpdate[] messages) {
