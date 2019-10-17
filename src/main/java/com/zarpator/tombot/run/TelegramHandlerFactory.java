@@ -13,7 +13,7 @@ public class TelegramHandlerFactory {
 
 	void initiateHandlers(){
 		this.internalEventHandler = new InternalEventHandler(new TelegramBotServerConnectionHandler());
-		this.logic = new Logic();
+		this.logic = new Logic(this.internalEventHandler);
 		this.userRequestHandler = new TelegramUserRequestHandler(this.internalEventHandler, this.logic);
 	}
 	

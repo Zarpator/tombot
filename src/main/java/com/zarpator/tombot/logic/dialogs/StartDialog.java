@@ -231,7 +231,7 @@ public class StartDialog extends AbstractFullDialog {
 							dbUserWhoSentMessage.getId()));
 
 			// add the event to the eventhandler
-			myEventHandler.addEvent(notificationTimestamp, reminderMessage);
+			myEventHandler.addMessageEvent(notificationTimestamp, reminderMessage);
 
 			messageForDialogHandler
 					.setText("Danke! Es ist jetzt alles eingerichtet. Wenn du wieder putzen musst, schreibe ich dir");
