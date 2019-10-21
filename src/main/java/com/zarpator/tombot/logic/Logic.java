@@ -5,13 +5,13 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 
 import com.zarpator.tombot.datalayer.DataAccessObject;
-import com.zarpator.tombot.logic.event.InternalEventHandler;
+import com.zarpator.tombot.logic.event.EventHandler;
 
 public class Logic {
 	DataAccessObject myDAO;
-	InternalEventHandler myEH;
+	EventHandler myEH;
 	
-	public Logic (InternalEventHandler eventHandler) {
+	public Logic (EventHandler eventHandler) {
 		this.myDAO = new DataAccessObject();
 		this.myEH = eventHandler;
 	}

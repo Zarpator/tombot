@@ -5,12 +5,12 @@ import com.zarpator.tombot.datalayer.DbChat;
 import com.zarpator.tombot.datalayer.DbUser;
 import com.zarpator.tombot.logic.Logic;
 import com.zarpator.tombot.logic.MiddlelayerHttpAnswerForTelegram;
-import com.zarpator.tombot.logic.event.InternalEventHandler;
+import com.zarpator.tombot.logic.event.EventHandler;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmMessage;
 
 public class AnswerwithusersownmessageDialog extends AbstractFullDialog {
 
-	public AnswerwithusersownmessageDialog(TgmMessage message, DataAccessObject dao, DbChat chat, DbUser user, InternalEventHandler myEventHandler, Logic myLogic) {
+	public AnswerwithusersownmessageDialog(TgmMessage message, DataAccessObject dao, DbChat chat, DbUser user, EventHandler myEventHandler, Logic myLogic) {
 		super(message, dao, chat, user, myEventHandler, myLogic);
 		this.mySpecificDialogStates = new DialogState[] {
 				new FirstDialogState()

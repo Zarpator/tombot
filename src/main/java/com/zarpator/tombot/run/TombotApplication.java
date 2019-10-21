@@ -3,13 +3,13 @@ package com.zarpator.tombot.run;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.zarpator.tombot.logic.UserRequestHandler;
-import com.zarpator.tombot.logic.event.InternalEventHandler;
+import com.zarpator.tombot.logic.event.EventHandler;
 
 @SpringBootApplication
 public class TombotApplication {
 	
 	public static UserRequestHandler userRequestHandler;
-	public static InternalEventHandler internalEventHandler;
+	public static EventHandler internalEventHandler;
 
 	public static void main(String[] args) {
 		

@@ -10,13 +10,13 @@ import com.zarpator.tombot.servicelayer.receiving.TgmAnswerWithMessage;
 import com.zarpator.tombot.servicelayer.sending.HttpMessageForTelegramServers;
 import com.zarpator.tombot.utils.Logger;
 
-public class InternalEventHandler extends Thread {
+public class EventHandler extends Thread {
 	Logger logger = new Logger();
 	BotServerConnectionHandler myConnectionHandler;
 	
 	private EventList events;
 
-	public InternalEventHandler(BotServerConnectionHandler ConnectionHandler) {
+	public EventHandler(BotServerConnectionHandler ConnectionHandler) {
 		this.myConnectionHandler = ConnectionHandler;
 		events = new EventList();
 	}

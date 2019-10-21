@@ -6,7 +6,7 @@ import com.zarpator.tombot.datalayer.DataAccessObject;
 import com.zarpator.tombot.datalayer.DbChat;
 import com.zarpator.tombot.datalayer.DbUser;
 import com.zarpator.tombot.logic.dialogs.DialogHandler;
-import com.zarpator.tombot.logic.event.InternalEventHandler;
+import com.zarpator.tombot.logic.event.EventHandler;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmChat;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUpdate;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUser;
@@ -17,10 +17,10 @@ public class Inspector {
 
 	DialogHandler myDH;
 	DataAccessObject myDAO;
-	InternalEventHandler myEventHandler;
+	EventHandler myEventHandler;
 	Logic myLogic;
 	
-	Inspector(InternalEventHandler myEventHandler, Logic myLogic){
+	Inspector(EventHandler myEventHandler, Logic myLogic){
 		this.myEventHandler = myEventHandler;
 		this.myLogic = myLogic;
 		this.myDH = new DialogHandler(this.myEventHandler, this.myLogic);

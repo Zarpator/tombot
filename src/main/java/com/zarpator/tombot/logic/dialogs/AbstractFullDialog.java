@@ -5,14 +5,14 @@ import com.zarpator.tombot.datalayer.DbChat;
 import com.zarpator.tombot.datalayer.DbUser;
 import com.zarpator.tombot.logic.Logic;
 import com.zarpator.tombot.logic.MiddlelayerHttpAnswerForTelegram;
-import com.zarpator.tombot.logic.event.InternalEventHandler;
+import com.zarpator.tombot.logic.event.EventHandler;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmMessage;
 
 public abstract class AbstractFullDialog {
 	
 	protected TgmMessage messageToProcess;
 	protected DataAccessObject myDAO;
-	protected InternalEventHandler myEventHandler;
+	protected EventHandler myEventHandler;
 	protected Logic myLogic;
 	protected DbUser dbUserWhoSentMessage;
 	protected DbChat dbChatWhereCommandWasGiven;
@@ -22,7 +22,7 @@ public abstract class AbstractFullDialog {
 	protected int stateIncrement = stateIncrementStandard;
 	protected boolean dialogFinished = false;
 	
-	public AbstractFullDialog(TgmMessage messageToProcess, DataAccessObject myDAO, DbChat dbChatWhereCommandWasGiven, DbUser dbUserWhoSentMessage, InternalEventHandler myEventHandler, Logic myLogic) {
+	public AbstractFullDialog(TgmMessage messageToProcess, DataAccessObject myDAO, DbChat dbChatWhereCommandWasGiven, DbUser dbUserWhoSentMessage, EventHandler myEventHandler, Logic myLogic) {
 		this.messageToProcess = messageToProcess;
 		this.myDAO = myDAO;
 		this.dbUserWhoSentMessage = dbUserWhoSentMessage;

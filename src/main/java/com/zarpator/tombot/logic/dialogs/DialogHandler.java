@@ -6,17 +6,17 @@ import com.zarpator.tombot.datalayer.DbUser;
 import com.zarpator.tombot.logic.EntityNotFoundException;
 import com.zarpator.tombot.logic.Logic;
 import com.zarpator.tombot.logic.MiddlelayerHttpAnswerForTelegram;
-import com.zarpator.tombot.logic.event.InternalEventHandler;
+import com.zarpator.tombot.logic.event.EventHandler;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmMessage;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUpdate;
 
 public class DialogHandler {
 
 	DataAccessObject myDAO = new DataAccessObject();
-	InternalEventHandler myEventHandler;
+	EventHandler myEventHandler;
 	Logic myLogic;
 	
-	public DialogHandler(InternalEventHandler myEventHandler, Logic myLogic) {
+	public DialogHandler(EventHandler myEventHandler, Logic myLogic) {
 		this.myEventHandler = myEventHandler;
 		this.myLogic = myLogic;
 	}
