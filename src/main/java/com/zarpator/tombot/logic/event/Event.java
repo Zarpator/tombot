@@ -4,16 +4,16 @@ import java.time.LocalDateTime;
 
 import com.zarpator.tombot.servicelayer.sending.HttpMessageForTelegramServers;
 /**
- * Event that represents the time when a specific bot command should be executed.
+ * Event that represents the time when a something should happen.
+ * Child classes have the possible behaviour..
  * 
  */
-class Event {
+abstract class Event {
 	private LocalDateTime timestamp;
 	HttpMessageForTelegramServers message;
 	
-	Event(LocalDateTime timestamp, HttpMessageForTelegramServers message){
-		this.timestamp = timestamp;
-		this.message = message;
+	Event(LocalDateTime timestamp){
+		this.timestamp = timestamp;		
 	}
 
 	public LocalDateTime getTimestamp() {
@@ -22,13 +22,5 @@ class Event {
 
 	public void setTimestamp(LocalDateTime timestamp) {
 		this.timestamp = timestamp;
-	}
-
-	public HttpMessageForTelegramServers getMessage() {
-		return message;
-	}
-
-	public void setMessage(HttpMessageForTelegramServers message) {
-		this.message = message;
 	}
 }

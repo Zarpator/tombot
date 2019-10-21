@@ -46,7 +46,7 @@ public class EventHandler extends Thread {
 					continue;
 				}
 
-				sendMessage(nextEvent);
+				execute(nextEvent);
 
 				events.removeNextEvent();
 
@@ -55,6 +55,27 @@ public class EventHandler extends Thread {
 				waitForNextInterruption();
 			}
 		}
+	}
+
+	private void execute(Event event) {
+		if (event.getClass() == ActionEvent.class) {
+			executeAction((ActionEvent) event);
+		} else if (event.getClass() == MessageEvent.class) {
+			sendMessage((MessageEvent) event);
+		} else {
+			
+		}
+	}
+
+	private void executeAction(ActionEvent event) {
+		Action action = event.getAction();
+		action.execute();
+	}
+
+	private void sendMessage(MessageEvent nearestUpcomingEvent) {
+		HttpMessageForTelegramServers message = nearestUpcomingEvent.getMessage();
+		
+		myConnectionHandler.sendSingleMessageToServer(message, TgmAnswerWithMessage.class);
 	}
 
 	synchronized private void waitForNextInterruption() {
@@ -68,13 +89,11 @@ public class EventHandler extends Thread {
 	public void addMessageEvent(LocalDateTime timestamp, HttpMessageForTelegramServers message) {
 		logger.log("addEvent called!");
 		this.interrupt();
-		events.insertNewEvent(new Event(timestamp, message));
+		events.insertNewEvent(new MessageEvent(timestamp, message));
 	}
-
-	private void sendMessage(Event nearestUpcomingEvent) {
-		HttpMessageForTelegramServers message = nearestUpcomingEvent.getMessage();
-		
-		myConnectionHandler.sendSingleMessageToServer(message, TgmAnswerWithMessage.class);
+	
+	public void addActionEvent(LocalDateTime timestamp, Action action) {
+		events.insertNewEvent(new ActionEvent(timestamp, action));
 	}
 
 	private long getWaitingTime(Event event) {

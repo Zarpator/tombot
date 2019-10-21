@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 
 import com.zarpator.tombot.datalayer.DataAccessObject;
+import com.zarpator.tombot.logic.event.Action;
 import com.zarpator.tombot.logic.event.EventHandler;
 
 public class Logic {
@@ -18,13 +19,9 @@ public class Logic {
 	
 	public void addRoomForwardingJob(int householdId, DayOfWeek lastDayOfPeriod) {
 		// TODO start automatic room forwarding job
-
+		
 		LocalDateTime notificationTime = findNextCleaningTime(lastDayOfPeriod);
-
-		// TODO rotate rooms, when last day is reached (not, if room is not cleaned yet by resp person)
-		// TODO add same event again for next week
-//		myEH.addEvent(notificationTime, [rotate rooms and add same event again for next week]);
-			// TODO add Event to EventHandler, that calls a method from a class when the time is ready (not necessarily a message to a user)
+		myEH.addActionEvent(notificationTime, new RotateRoomsAction(/* params needed?*/));
 		
 	}
 	
@@ -32,5 +29,16 @@ public class Logic {
 		LocalDateTime dateTime = LocalDateTime.now();
 		LocalDateTime notificationTimestamp = dateTime.with(TemporalAdjusters.next(lastDayOfPeriod));
 		return notificationTimestamp;
+	}
+	
+	private class RotateRoomsAction implements Action {
+		private RotateRoomsAction(/* TODO params needed?*/) {}
+		
+		@Override
+		public void execute() {
+			// TODO rotate rooms, when last day is reached (not, if room is not cleaned yet by resp person)
+			// TODO add same event again for next week
+//			TODO use Logic-Class
+		}
 	}
 }
