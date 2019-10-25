@@ -82,11 +82,8 @@ public class Inspector {
 	}
 
 	private boolean messageSenderIsMissingInDatabase(TgmUser messageSender) {
-		try {
-			myDAO.getUserById(messageSender.getId());
-		} catch (EntityNotFoundException e) {
+		if (myDAO.getUserById(messageSender.getId()) == null)
 			return true;
-		}
 		return false;
 	}
 }

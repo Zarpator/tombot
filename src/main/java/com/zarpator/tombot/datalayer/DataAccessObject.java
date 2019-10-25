@@ -31,15 +31,13 @@ public class DataAccessObject {
 		throw new EntityNotFoundException();
 	}
 
-	public DbUser getUserById(int id) throws EntityNotFoundException {
-
+	public DbUser getUserById(int id){
 		for (DbUser user : allUsers) {
 			if (user.getId() == id) {
 				return user;
 			}
 		}
-
-		throw new EntityNotFoundException();
+		return null;
 	}
 
 	private List<Integer> getUserIdsOfHousehold(int householdId) {
@@ -51,6 +49,17 @@ public class DataAccessObject {
 		}
 
 		return userIds;
+	}
+	
+	public List<DbRoomToUser> getUsersToRoom(int roomId) {
+		List<DbRoomToUser> roomToUserList = new ArrayList<DbRoomToUser>();
+		
+		for (DbRoomToUser roomToUser : allRoomsToUsers) {
+			if (roomToUser.getRoomId() == roomId) {
+				roomToUserList.add(roomToUser);
+			}
+		}
+		return roomToUserList;
 	}
 
 	public DbHousehold getHouseholdById(int id) {
@@ -90,14 +99,15 @@ public class DataAccessObject {
 	}
 
 	public ArrayList<DbRoom> getRoomsByHouseholdId(int householdId) {
-		ArrayList<DbRoom> rooms = new ArrayList<>();
+		ArrayList<DbRoom> roomList = new ArrayList<>();
 		for (DbRoomToHousehold roomToHousehold : allRoomsToHouseholds) {
 			if (roomToHousehold.getHouseholdId() == householdId) {
 				int roomId = roomToHousehold.getRoomId();
-				rooms.add(this.getRoomById(roomId));
+				roomList.add(this.getRoomById(roomId));
 			}
 		}
-		return rooms;
+		roomList.sort(DbRoom.getSequencePositionComparator());
+		return roomList;
 	}
 
 	public List<DbGrocer> getGroceriesOfUser(int userId) {
@@ -160,7 +170,9 @@ public class DataAccessObject {
 	}
 
 	public DbRoom addRoom(int householdId, String name) {
-		DbRoom room = new DbRoom(getNewRoomId(), name);
+		int sequencePosition = this.getNewRoomSequencePosition(householdId);
+		
+		DbRoom room = new DbRoom(getNewRoomId(), name, sequencePosition);
 
 		allRooms.add(room);
 
@@ -212,6 +224,11 @@ public class DataAccessObject {
 		} else {
 			return allRooms.size() + 1;
 		}
+	}
+	
+	private int getNewRoomSequencePosition(int householdId) {
+		//TODO implement
+		return 0;
 	}
 
 	public ArrayList<DbChat> getAllChatsAsArrayList() {

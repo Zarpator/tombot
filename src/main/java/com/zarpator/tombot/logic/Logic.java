@@ -3,42 +3,90 @@ package com.zarpator.tombot.logic;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.List;
 
 import com.zarpator.tombot.datalayer.DataAccessObject;
+import com.zarpator.tombot.datalayer.DbHousehold;
+import com.zarpator.tombot.datalayer.DbRoom;
+import com.zarpator.tombot.datalayer.DbRoomToUser;
+import com.zarpator.tombot.datalayer.DbRoomToUser.Task;
 import com.zarpator.tombot.logic.event.Action;
 import com.zarpator.tombot.logic.event.EventHandler;
+import com.zarpator.tombot.utils.Logger;
 
 public class Logic {
 	DataAccessObject myDAO;
 	EventHandler myEH;
+	Logger logger;
 	
 	public Logic (EventHandler eventHandler) {
 		this.myDAO = new DataAccessObject();
 		this.myEH = eventHandler;
+		this.logger = new Logger();
 	}
 	
-	public void addRoomForwardingJob(int householdId, DayOfWeek lastDayOfPeriod) {
-		// TODO start automatic room forwarding job
-		
-		LocalDateTime notificationTime = findNextCleaningTime(lastDayOfPeriod);
-		myEH.addActionEvent(notificationTime, new RotateRoomsAction(/* params needed?*/));
-		
+	// TODO remove lastdayofperiod
+	public void addRoomSwitchingJob(int householdId, DayOfWeek lastDayOfPeriod) {
+		// start automatic room forwarding job
+		addNextRoomSwitchingEvent(householdId);
 	}
 	
-	private LocalDateTime findNextCleaningTime(DayOfWeek lastDayOfPeriod) {
+	private void addNextRoomSwitchingEvent(int householdId) {
+		DbHousehold household = myDAO.getHouseholdById(householdId);
+		DayOfWeek lastDayOfPeriod = household.getLastDayOfPeriod();
+		LocalDateTime nextRoomSwitchingInterval = calculateTimeUntilNextSwitching(lastDayOfPeriod);
+		
+		myEH.addScheduledAction(nextRoomSwitchingInterval, new SwitchRoomsAction(householdId/* params needed?*/));
+	}
+	
+	private void switchRooms(int householdId){
+		// TODO rotate rooms, when last day is reached (not, if room is not cleaned yet by resp person)
+		
+		/**
+		 * 1 get first room in sequence
+		 * 2 rotate its cleaner to the next room:
+		 * 2a is nor responsible for cleaned room anymore
+		 * 2b is now responsible for next room (next sequencePosition)
+		 **
+		 */
+		
+		List<DbRoom> roomList = myDAO.getRoomsByHouseholdId(householdId);
+		
+		
+		for (DbRoom room : roomList) {
+			List<DbRoomToUser> roomToUserList = myDAO.getUsersToRoom(room.getId());
+			
+			for (DbRoomToUser roomToUser : roomToUserList) {
+				// TODO is alles berücksichtigt?
+				if (roomToUser.getTask() == Task.RESPONSIBLE) {
+					// TODO give the user the next room (but keep this room with him, he didnt clean it yet)
+				}
+				
+				if (roomToUser.getTask() == Task.FINISHED) {
+					// TODO remove his responsibility for this room
+					// TODO switch the cleaner to the next room
+				}
+			}
+		}
+	}
+	
+	private LocalDateTime calculateTimeUntilNextSwitching(DayOfWeek lastDayOfPeriod) {
 		LocalDateTime dateTime = LocalDateTime.now();
 		LocalDateTime notificationTimestamp = dateTime.with(TemporalAdjusters.next(lastDayOfPeriod));
 		return notificationTimestamp;
 	}
 	
-	private class RotateRoomsAction implements Action {
-		private RotateRoomsAction(/* TODO params needed?*/) {}
+	private class SwitchRoomsAction implements Action {
+		int householdId;
+
+		private SwitchRoomsAction(int householdId /* TODO params needed?*/) {
+			this.householdId = householdId;
+		}
 		
 		@Override
 		public void execute() {
-			// TODO rotate rooms, when last day is reached (not, if room is not cleaned yet by resp person)
-			// TODO add same event again for next week
-//			TODO use Logic-Class
+			switchRooms(householdId);
+			addNextRoomSwitchingEvent(householdId);
 		}
 	}
 }

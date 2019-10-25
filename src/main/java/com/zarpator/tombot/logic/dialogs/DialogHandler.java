@@ -29,16 +29,15 @@ public class DialogHandler {
 
 		DbUser dbUserWhoSentMessage;
 		int idOfUserWhoSentMessage = message.getFrom().getId();
-		try {
 			dbUserWhoSentMessage = myDAO.getUserById(idOfUserWhoSentMessage);
-		} catch (EntityNotFoundException e) {
+		if (dbUserWhoSentMessage == null) {
 			messageToReturnToInspector = new MiddlelayerHttpAnswerForTelegram();
 			messageToReturnToInspector.setText(
 					"Ich konnte dich nicht im System finden, da ist wohl etwas schief gelaufen. Hast du schon mit /start alles eingerichtet? Sonst frag mal meinen Entwickler :)");
 			messageToReturnToInspector.setChatId(idOfUserWhoSentMessage);
 			return messageToReturnToInspector;
 		}
-
+		
 		DbChat dbChatWhereCommandWasGiven;
 		int idOfChatWhereCommandWasGiven = message.getChat().getId();
 		try {

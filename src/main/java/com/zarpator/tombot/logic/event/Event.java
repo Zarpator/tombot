@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import com.zarpator.tombot.servicelayer.sending.HttpMessageForTelegramServers;
 /**
- * Event that represents the time when a something should happen.
+ * Event that represents the time when something should happen.
  * Child classes have the possible behaviour..
  * 
  */

@@ -92,7 +92,7 @@ public class EventHandler extends Thread {
 		events.insertNewEvent(new MessageEvent(timestamp, message));
 	}
 	
-	public void addActionEvent(LocalDateTime timestamp, Action action) {
+	public void addScheduledAction(LocalDateTime timestamp, Action action) {
 		events.insertNewEvent(new ActionEvent(timestamp, action));
 	}
 
