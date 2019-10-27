@@ -7,9 +7,9 @@ import java.util.List;
 
 import com.zarpator.tombot.datalayer.DataAccessObject;
 import com.zarpator.tombot.datalayer.DbHousehold;
-import com.zarpator.tombot.datalayer.DbRoom;
 import com.zarpator.tombot.datalayer.DbRoomToUser;
 import com.zarpator.tombot.datalayer.DbRoomToUser.Task;
+import com.zarpator.tombot.datalayer.DbUser;
 import com.zarpator.tombot.logic.event.Action;
 import com.zarpator.tombot.logic.event.EventHandler;
 import com.zarpator.tombot.utils.Logger;
@@ -39,32 +39,27 @@ public class Logic {
 		myEH.addScheduledAction(nextRoomSwitchingInterval, new SwitchRoomsAction(householdId/* params needed?*/));
 	}
 	
-	private void switchRooms(int householdId){
-		// TODO rotate rooms, when last day is reached (not, if room is not cleaned yet by resp person)
+	private void switchRooms(int householdId){		
+		List<DbUser> userList = myDAO.getAllUsersOfHousehold(householdId);
 		
-		/**
-		 * 1 get first room in sequence
-		 * 2 rotate its cleaner to the next room:
-		 * 2a is nor responsible for cleaned room anymore
-		 * 2b is now responsible for next room (next sequencePosition)
-		 **
-		 */
-		
-		List<DbRoom> roomList = myDAO.getRoomsByHouseholdId(householdId);
-		
-		
-		for (DbRoom room : roomList) {
-			List<DbRoomToUser> roomToUserList = myDAO.getUsersToRoom(room.getId());
+		for (DbUser user : userList) {
+			//TODO list still has to be sorted by room.sequencePosition (when not, a random room will be asigned
+			List<DbRoomToUser> roomToUserList = myDAO.getRoomsToUser(user.getId());
 			
+			boolean responsibleRoomFound = false;
 			for (DbRoomToUser roomToUser : roomToUserList) {
-				// TODO is alles berücksichtigt?
-				if (roomToUser.getTask() == Task.RESPONSIBLE) {
-					// TODO give the user the next room (but keep this room with him, he didnt clean it yet)
+
+				if (responsibleRoomFound) {
+					roomToUser.setTask(Task.RESPONSIBLE);
+					break;
 				}
 				
 				if (roomToUser.getTask() == Task.FINISHED) {
-					// TODO remove his responsibility for this room
-					// TODO switch the cleaner to the next room
+					responsibleRoomFound = true;
+					roomToUser.setTask(Task.NOTRESPONSIBLE);
+				} else if (roomToUser.getTask() == Task.RESPONSIBLE) {
+					// give the user the next room (but keep this room with him, he didnt clean it yet)
+					responsibleRoomFound = true;
 				}
 			}
 		}

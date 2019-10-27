@@ -39,6 +39,16 @@ public class DataAccessObject {
 		}
 		return null;
 	}
+	
+	public List<DbUser> getAllUsersOfHousehold(int householdId) {
+		List<Integer> userIds = this.getUserIdsOfHousehold(householdId);
+		
+		List<DbUser> userList = new ArrayList<DbUser>();
+		for (int userId : userIds) {
+			userList.add(this.getUserById(userId));
+		}
+		return userList;
+	}
 
 	private List<Integer> getUserIdsOfHousehold(int householdId) {
 		List<Integer> userIds = new ArrayList<Integer>();
@@ -49,17 +59,6 @@ public class DataAccessObject {
 		}
 
 		return userIds;
-	}
-	
-	public List<DbRoomToUser> getUsersToRoom(int roomId) {
-		List<DbRoomToUser> roomToUserList = new ArrayList<DbRoomToUser>();
-		
-		for (DbRoomToUser roomToUser : allRoomsToUsers) {
-			if (roomToUser.getRoomId() == roomId) {
-				roomToUserList.add(roomToUser);
-			}
-		}
-		return roomToUserList;
 	}
 
 	public DbHousehold getHouseholdById(int id) {
@@ -131,7 +130,11 @@ public class DataAccessObject {
 		}
 		return null;
 	}
-
+	
+	/**
+	 * @param userId
+	 * @return roomsToUsers // TODO sorted by sequencePosition
+	 */
 	public List<DbRoomToUser> getRoomsToUser(int userId) {
 		List<DbRoomToUser> roomsToUsers = new ArrayList<DbRoomToUser>();
 		for (DbRoomToUser roomToUser : allRoomsToUsers) {
