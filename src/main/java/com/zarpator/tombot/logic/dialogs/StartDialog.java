@@ -231,6 +231,9 @@ public class StartDialog extends AbstractFullDialog {
 
 			// add the event to the eventhandler
 			myEventHandler.addMessageEvent(notificationTimestamp, reminderMessage);
+			
+			// TODO testing: remove afterwards
+			myLogic.addRoomSwitchingJob(householdId);
 
 			messageForDialogHandler
 					.setText("Danke! Es ist jetzt alles eingerichtet. Wenn du wieder putzen musst, schreibe ich dir");

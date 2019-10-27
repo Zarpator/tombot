@@ -3,6 +3,7 @@ package com.zarpator.tombot.logic;
 import java.util.ArrayList;
 
 import com.zarpator.tombot.logic.event.EventHandler;
+import com.zarpator.tombot.servicelayer.BotFrameworkException;
 import com.zarpator.tombot.servicelayer.BotServerConnectionHandler;
 import com.zarpator.tombot.servicelayer.TelegramBotServerConnectionHandler;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUpdate;
@@ -30,13 +31,18 @@ public abstract class UserRequestHandler extends Thread {
 	public void run() {
 		logger.log("A new UserRequestHandler started in a new Thread");
 		while (true) {
+			
+			try {
+				TgmUpdate[] userMessages = myConnectionHandler.fetchNewUserRequests();
 
-			TgmUpdate[] userMessages = myConnectionHandler.fetchNewUserRequests();
+				// do the specific logic for the request
+				ArrayList<HttpMessageForTelegramServers> serverMessages = this.handle(userMessages);
 
-			// do the specific logic for the request
-			ArrayList<HttpMessageForTelegramServers> serverMessages = this.handle(userMessages);
-
-			this.send(serverMessages);
+				this.send(serverMessages);
+			} catch (BotFrameworkException e) {
+				logger.log("No Response from Server");
+				// no internet connection available
+			}
 
 			try {
 				Thread.sleep(500);
