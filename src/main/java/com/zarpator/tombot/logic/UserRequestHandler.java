@@ -3,7 +3,7 @@ package com.zarpator.tombot.logic;
 import java.util.ArrayList;
 
 import com.zarpator.tombot.logic.event.EventHandler;
-import com.zarpator.tombot.servicelayer.BotFrameworkException;
+import com.zarpator.tombot.servicelayer.BotServerHostUnknownException;
 import com.zarpator.tombot.servicelayer.BotServerConnectionHandler;
 import com.zarpator.tombot.servicelayer.TelegramBotServerConnectionHandler;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUpdate;
@@ -39,15 +39,21 @@ public abstract class UserRequestHandler extends Thread {
 				ArrayList<HttpMessageForTelegramServers> serverMessages = this.handle(userMessages);
 
 				this.send(serverMessages);
-			} catch (BotFrameworkException e) {
-				logger.log("No Response from Server");
-				// no internet connection available
-			}
 
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			} catch (BotServerHostUnknownException e) {
+				// no internet connection available
+				logger.log("No Response from Server");
+				
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException eInterrupted) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

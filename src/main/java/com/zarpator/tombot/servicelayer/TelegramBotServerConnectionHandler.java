@@ -12,7 +12,7 @@ import com.zarpator.tombot.servicelayer.sending.PresetMessageForGetUpdates;
 
 public class TelegramBotServerConnectionHandler implements BotServerConnectionHandler {
 
-	public TgmUpdate[] fetchNewUserRequests() {
+	public TgmUpdate[] fetchNewUserRequests() throws BotServerHostUnknownException {
 		TgmAnswerWithUpdateArray answer = this.sendSingleMessageToServer(
 				new HttpMessageForTelegramServers(new PresetMessageForGetUpdates()), TgmAnswerWithUpdateArray.class);
 
@@ -22,7 +22,7 @@ public class TelegramBotServerConnectionHandler implements BotServerConnectionHa
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void sendMultipleMessagesToServer(ArrayList<HttpMessageForTelegramServers> messagesForServer,
-			Class typeOfTheExpectedTgmAnswers) {
+			Class typeOfTheExpectedTgmAnswers) throws BotServerHostUnknownException {
 		
 		if (messagesForServer != null && messagesForServer.isEmpty()) {
 			System.out.println("No Messages to send to Telegram");
@@ -41,16 +41,20 @@ public class TelegramBotServerConnectionHandler implements BotServerConnectionHa
 	}
 
 	public <T extends TgmAnswerSuperClass> T sendSingleMessageToServer(HttpMessageForTelegramServers message,
-			Class<T> typeOfTheTgmAnswer) {
+			Class<T> typeOfTheTgmAnswer) throws BotServerHostUnknownException {
 
 		String url = buildURL(message);
 
 		RestTemplate restTemplate = new RestTemplate();
-		T answer = restTemplate.getForObject(url, typeOfTheTgmAnswer);
+		try {
+			T answer = restTemplate.getForObject(url, typeOfTheTgmAnswer);
 
-		incrementOffsetIfItsUpdateRequest(message, answer);
+			incrementOffsetIfItsUpdateRequest(message, answer);
 
-		return answer;
+			return answer;
+		} catch (Exception e) {
+			throw new BotServerHostUnknownException();
+		}
 	}
 
 	private <T extends TgmAnswerSuperClass> void incrementOffsetIfItsUpdateRequest(

@@ -3,6 +3,7 @@ package com.zarpator.tombot.logic;
 import java.util.ArrayList;
 
 import com.zarpator.tombot.logic.event.EventHandler;
+import com.zarpator.tombot.servicelayer.BotServerHostUnknownException;
 import com.zarpator.tombot.servicelayer.TelegramBotServerConnectionHandler;
 import com.zarpator.tombot.servicelayer.receiving.TgmAnswerWithMessage;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUpdate;
@@ -35,7 +36,11 @@ public class TelegramUserRequestHandler extends UserRequestHandler {
 
 	@Override
 	protected void send(ArrayList<HttpMessageForTelegramServers> messagesForServer) {
-		
-		myConnectionHandler.sendMultipleMessagesToServer(messagesForServer, TgmAnswerWithMessage.class);
+
+		try {
+			myConnectionHandler.sendMultipleMessagesToServer(messagesForServer, TgmAnswerWithMessage.class);
+		} catch (BotServerHostUnknownException e) {
+			logger.log("TelegramUserRequestHandler: Server not reachable");
+		}
 	}
 }

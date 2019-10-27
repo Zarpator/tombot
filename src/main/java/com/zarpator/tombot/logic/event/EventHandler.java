@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import com.zarpator.tombot.servicelayer.BotServerConnectionHandler;
+import com.zarpator.tombot.servicelayer.BotServerHostUnknownException;
 import com.zarpator.tombot.servicelayer.receiving.TgmAnswerWithMessage;
 import com.zarpator.tombot.servicelayer.sending.HttpMessageForTelegramServers;
 import com.zarpator.tombot.utils.Logger;
@@ -13,7 +14,7 @@ import com.zarpator.tombot.utils.Logger;
 public class EventHandler extends Thread {
 	Logger logger = new Logger();
 	BotServerConnectionHandler myConnectionHandler;
-	
+
 	private EventList events;
 
 	public EventHandler(BotServerConnectionHandler ConnectionHandler) {
@@ -63,7 +64,7 @@ public class EventHandler extends Thread {
 		} else if (event.getClass() == MessageEvent.class) {
 			sendMessage((MessageEvent) event);
 		} else {
-			
+
 		}
 	}
 
@@ -75,13 +76,17 @@ public class EventHandler extends Thread {
 	private void sendMessage(MessageEvent nearestUpcomingEvent) {
 		HttpMessageForTelegramServers message = nearestUpcomingEvent.getMessage();
 		
-		myConnectionHandler.sendSingleMessageToServer(message, TgmAnswerWithMessage.class);
+		try {
+			myConnectionHandler.sendSingleMessageToServer(message, TgmAnswerWithMessage.class);
+		} catch(BotServerHostUnknownException e) {
+			logger.log("EventHandler: Bot Server not reachable");
+		}
 	}
 
 	synchronized private void waitForNextInterruption() {
 		try {
 			this.wait();
-		} catch(InterruptedException e) {
+		} catch (InterruptedException e) {
 			return;
 		}
 	}
@@ -91,7 +96,7 @@ public class EventHandler extends Thread {
 		this.interrupt();
 		events.insertNewEvent(new MessageEvent(timestamp, message));
 	}
-	
+
 	public void addScheduledAction(LocalDateTime timestamp, Action action) {
 		events.insertNewEvent(new ActionEvent(timestamp, action));
 	}
@@ -122,13 +127,13 @@ public class EventHandler extends Thread {
 			events.sort(new EventComparator());
 		}
 
-		private class EventComparator implements Comparator<Event>{
+		private class EventComparator implements Comparator<Event> {
 
 			@Override
 			public int compare(Event event1, Event event2) {
-				
+
 				int comparison = event1.getTimestamp().compareTo(event2.getTimestamp());
-				
+
 				return comparison;
 			}
 
