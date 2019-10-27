@@ -30,6 +30,7 @@ public class DbRoomToUser {
 	public enum Task{
 		RESPONSIBLE,
 		FINISHED,
+		OVERDUE,
 		NOTRESPONSIBLE
 	}
 }

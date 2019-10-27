@@ -12,6 +12,7 @@ import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUpdate;
 import com.zarpator.tombot.servicelayer.receiving.telegramobjects.TgmUser;
 import com.zarpator.tombot.servicelayer.sending.HttpMessageForTelegramServers;
 import com.zarpator.tombot.servicelayer.sending.PresetMessageForSendMessage;
+import com.zarpator.tombot.utils.Logger;
 
 public class Inspector {
 
@@ -19,18 +20,25 @@ public class Inspector {
 	DataAccessObject myDAO;
 	EventHandler myEventHandler;
 	Logic myLogic;
+	Logger logger;
 	
 	Inspector(EventHandler myEventHandler, Logic myLogic){
 		this.myEventHandler = myEventHandler;
 		this.myLogic = myLogic;
 		this.myDH = new DialogHandler(this.myEventHandler, this.myLogic);
 		this.myDAO = new DataAccessObject();
+		this.logger = new Logger();
 	}
 	
 	// Does specific routine for the TgmUpdates in the Answer and returns a messages
 	// per Update
 
 	public  ArrayList<HttpMessageForTelegramServers> doSpecificLogic(TgmUpdate update) {
+		MiddlelayerHttpAnswerForTelegram answerFromDialogHandler;
+		if (update.getMessage() == null) {
+			logger.log("Inspector: received an update that is no message. Workaround: increment offset for Telegram getUpdate-Method manually");
+		}
+		
 		TgmUser messageSender = update.getMessage().getFrom();
 		if (messageSenderIsMissingInDatabase(messageSender)) {
 			myDAO.addNewUser(messageSender);
@@ -41,8 +49,7 @@ public class Inspector {
 			myDAO.addNewChat(messageChat);
 		}
 
-		MiddlelayerHttpAnswerForTelegram answerFromDialogHandler = myDH
-				.processUpdateByGettingDbEntitiesAndDelegating(update);
+		answerFromDialogHandler = myDH.processUpdateByGettingDbEntitiesAndDelegating(update);
 
 		if (answerFromDialogHandler == null) {
 			return null;

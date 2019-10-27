@@ -48,16 +48,22 @@ public class Logic {
 
 				if (responsibleRoomFound) {
 					roomToUser.setTask(Task.RESPONSIBLE);
+					responsibleRoomFound = false;
 					break;
 				}
 				
 				if (roomToUser.getTask() == Task.FINISHED) {
-					responsibleRoomFound = true;
 					roomToUser.setTask(Task.NOTRESPONSIBLE);
+					responsibleRoomFound = true;
 				} else if (roomToUser.getTask() == Task.RESPONSIBLE) {
 					// give the user the next room (but keep the old room with him, he didnt clean it yet)
+					roomToUser.setTask(Task.OVERDUE);
 					responsibleRoomFound = true;
 				}
+			}
+			//if user should now be responsible for first room in roomToUserList
+			if(responsibleRoomFound == true) {
+				roomToUserList.get(0).setTask(Task.RESPONSIBLE);
 			}
 		}
 	}
