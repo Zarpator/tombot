@@ -25,9 +25,7 @@ public class Logic {
 		this.logger = new Logger();
 	}
 	
-	// TODO remove lastdayofperiod
-	public void addRoomSwitchingJob(int householdId, DayOfWeek lastDayOfPeriod) {
-		// start automatic room forwarding job
+	public void addRoomSwitchingJob(int householdId) {
 		addNextRoomSwitchingEvent(householdId);
 	}
 	
@@ -36,14 +34,14 @@ public class Logic {
 		DayOfWeek lastDayOfPeriod = household.getLastDayOfPeriod();
 		LocalDateTime nextRoomSwitchingInterval = calculateTimeUntilNextSwitching(lastDayOfPeriod);
 		
-		myEH.addScheduledAction(nextRoomSwitchingInterval, new SwitchRoomsAction(householdId/* params needed?*/));
+		myEH.addScheduledAction(nextRoomSwitchingInterval, new SwitchRoomsAction(householdId));
 	}
 	
 	private void switchRooms(int householdId){		
 		List<DbUser> userList = myDAO.getAllUsersOfHousehold(householdId);
 		
 		for (DbUser user : userList) {
-			//TODO list still has to be sorted by room.sequencePosition (when not, a random room will be asigned
+			//TODO list still has to be sorted by room.sequencePosition (when not, a random room will be assigned
 			List<DbRoomToUser> roomToUserList = myDAO.getRoomsToUser(user.getId());
 			
 			boolean responsibleRoomFound = false;
@@ -58,7 +56,7 @@ public class Logic {
 					responsibleRoomFound = true;
 					roomToUser.setTask(Task.NOTRESPONSIBLE);
 				} else if (roomToUser.getTask() == Task.RESPONSIBLE) {
-					// give the user the next room (but keep this room with him, he didnt clean it yet)
+					// give the user the next room (but keep the old room with him, he didnt clean it yet)
 					responsibleRoomFound = true;
 				}
 			}
@@ -74,7 +72,7 @@ public class Logic {
 	private class SwitchRoomsAction implements Action {
 		int householdId;
 
-		private SwitchRoomsAction(int householdId /* TODO params needed?*/) {
+		private SwitchRoomsAction(int householdId) {
 			this.householdId = householdId;
 		}
 		

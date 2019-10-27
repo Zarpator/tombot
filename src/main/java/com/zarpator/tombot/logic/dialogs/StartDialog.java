@@ -222,7 +222,7 @@ public class StartDialog extends AbstractFullDialog {
 			}
 			String roomsToClean = rooms.substring(0, rooms.length() - 2);
 
-			myLogic.addRoomSwitchingJob(householdId, household.getLastDayOfPeriod());
+			myLogic.addRoomSwitchingJob(householdId);
 			
 			// write reminder message
 			HttpMessageForTelegramServers reminderMessage = new HttpMessageForTelegramServers(
