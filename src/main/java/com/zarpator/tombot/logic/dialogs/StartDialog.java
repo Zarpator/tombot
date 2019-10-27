@@ -64,13 +64,12 @@ public class StartDialog extends AbstractFullDialog {
 
 			MiddlelayerHttpAnswerForTelegram messageForDialogHandler = new MiddlelayerHttpAnswerForTelegram();
 			String userInput = messageToProcess.getText();
-			int userId = messageToProcess.getFrom().getId();
 
 			int householdId;
-			if (myDAO.getHouseholdByUserId(userId) == null) {
+			if (myDAO.getHouseholdByUserId(dbUserWhoSentMessage.getId()) == null) {
 				householdId = myDAO.addHousehold(messageToProcess.getFrom().getId());
 			} else {
-				householdId = myDAO.getHouseholdByUserId(userId).getId();
+				householdId = myDAO.getHouseholdByUserId(dbUserWhoSentMessage.getId()).getId();
 			}
 
 			if (!userInput.equals("Fertig")) {
@@ -80,7 +79,7 @@ public class StartDialog extends AbstractFullDialog {
 				stateIncrement = 0;
 				return MiddlelayerHttpAnswerForTelegram.noMessage;
 			} else {
-
+				
 				List<DbRoom> rooms = myDAO.getRoomsInHousehold(householdId);
 
 				messageForDialogHandler.setChatId(dbChatWhereCommandWasGiven.getId());

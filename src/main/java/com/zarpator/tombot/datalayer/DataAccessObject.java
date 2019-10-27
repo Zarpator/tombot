@@ -96,6 +96,12 @@ public class DataAccessObject {
 		}
 		return null;
 	}
+	
+	/**
+	 * 
+	 * @param householdId
+	 * @return rooms sorted by sequencePosition
+	 */
 
 	public ArrayList<DbRoom> getRoomsInHousehold(int householdId) {
 		ArrayList<DbRoom> roomList = new ArrayList<>();
@@ -133,16 +139,25 @@ public class DataAccessObject {
 	
 	/**
 	 * @param userId
-	 * @return roomsToUsers // TODO sorted by sequencePosition
+	 * @return roomsToUsers sorted by sequencePosition
 	 */
 	public List<DbRoomToUser> getRoomsToUser(int userId) {
-		List<DbRoomToUser> roomsToUsers = new ArrayList<DbRoomToUser>();
+		List<DbRoom> roomList = new ArrayList<DbRoom>();
+		List<DbRoomToUser> roomToUserList = new ArrayList<DbRoomToUser>();
+		
 		for (DbRoomToUser roomToUser : allRoomsToUsers) {
 			if (roomToUser.getUserId() == userId) {
-				roomsToUsers.add(roomToUser);
+				roomList.add(this.getRoomById(roomToUser.getRoomId()));
 			}
 		}
-		return roomsToUsers;
+		
+		roomList.sort(DbRoom.getSequencePositionComparator());
+		
+		for (DbRoom room : roomList) {
+			roomToUserList.add(this.getRoomToUser(userId, room.getName()));
+		}
+		
+		return roomToUserList;
 	}
 
 	public void addNewUser(TgmUser unpersistedTgmUser) {

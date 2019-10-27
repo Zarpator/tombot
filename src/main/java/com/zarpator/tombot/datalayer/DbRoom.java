@@ -38,9 +38,9 @@ public class DbRoom {
 		@Override
 		public int compare(DbRoom o1, DbRoom o2) {
 			if(o1.getSequencePosition() < o2.getSequencePosition()) {
-				return 1;
-			} else if (o1.getSequencePosition() > o2.getSequencePosition()) {
 				return -1;
+			} else if (o1.getSequencePosition() > o2.getSequencePosition()) {
+				return 1;
 			}
 			return 0;
 		}

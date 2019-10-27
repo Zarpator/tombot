@@ -41,7 +41,6 @@ public class Logic {
 		List<DbUser> userList = myDAO.getAllUsersOfHousehold(householdId);
 		
 		for (DbUser user : userList) {
-			//TODO list still has to be sorted by room.sequencePosition (when not, a random room will be assigned
 			List<DbRoomToUser> roomToUserList = myDAO.getRoomsToUser(user.getId());
 			
 			boolean responsibleRoomFound = false;
