@@ -81,7 +81,7 @@ public class StartDialog extends AbstractFullDialog {
 				return MiddlelayerHttpAnswerForTelegram.noMessage;
 			} else {
 
-				List<DbRoom> rooms = myDAO.getRoomsByHouseholdId(householdId);
+				List<DbRoom> rooms = myDAO.getRoomsInHousehold(householdId);
 
 				messageForDialogHandler.setChatId(dbChatWhereCommandWasGiven.getId());
 
@@ -121,7 +121,7 @@ public class StartDialog extends AbstractFullDialog {
 				String messageText = "Diesen Raum müsst ihr in eurer WG nicht putzen. Nenne einen Raum, den du putzen musst:\n\n";
 
 				int householdId = myDAO.getHouseholdByUserId(dbUserWhoSentMessage.getId()).getId();
-				List<DbRoom> roomsInHousehold = myDAO.getRoomsByHouseholdId(householdId);
+				List<DbRoom> roomsInHousehold = myDAO.getRoomsInHousehold(householdId);
 
 				for (DbRoom room : roomsInHousehold) {
 					messageText += room.getName() + ", ";
@@ -215,7 +215,7 @@ public class StartDialog extends AbstractFullDialog {
 			LocalDateTime notificationTimestamp = dateTime.with(TemporalAdjusters.next(notificationDay));
 			
 			int householdId = myDAO.getHouseholdByUserId(dbUserWhoSentMessage.getId()).getId();
-			List<DbRoom> roomsList = myDAO.getRoomsByHouseholdId(householdId);
+			List<DbRoom> roomsList = myDAO.getRoomsInHousehold(householdId);
 			String rooms = "";
 			for (Iterator<DbRoom> iterator = roomsList.iterator(); iterator.hasNext();) {
 				rooms += iterator.next().getName() + ", ";

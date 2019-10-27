@@ -97,7 +97,7 @@ public class DataAccessObject {
 		return null;
 	}
 
-	public ArrayList<DbRoom> getRoomsByHouseholdId(int householdId) {
+	public ArrayList<DbRoom> getRoomsInHousehold(int householdId) {
 		ArrayList<DbRoom> roomList = new ArrayList<>();
 		for (DbRoomToHousehold roomToHousehold : allRoomsToHouseholds) {
 			if (roomToHousehold.getHouseholdId() == householdId) {
@@ -230,8 +230,17 @@ public class DataAccessObject {
 	}
 	
 	private int getNewRoomSequencePosition(int householdId) {
-		//TODO implement
-		return 0;
+		List<DbRoom> roomList= this.getRoomsInHousehold(householdId);
+		int highestSequencePosition = 0;
+		
+		for (DbRoom room : roomList) {
+			int roomSequencePosition = room.getSequencePosition();
+			if (roomSequencePosition > highestSequencePosition) {
+				highestSequencePosition = roomSequencePosition;
+			}
+		}
+		
+		return highestSequencePosition + 1;
 	}
 
 	public ArrayList<DbChat> getAllChatsAsArrayList() {
